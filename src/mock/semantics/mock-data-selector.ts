@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { SemanticType } from './fieldNameAnalyzer';
+import { SemanticType } from './field-name-analyzer';
 import { MockValue } from '../../runtime/types';
 
 export interface MockOptions {

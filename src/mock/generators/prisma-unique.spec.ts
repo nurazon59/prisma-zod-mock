@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { UniqueValueGenerator } from './prismaUnique';
+import { UniqueValueGenerator } from './prisma-unique';
 import { createMockDMMFField } from '../../../tests/test-helpers';
 
 describe('UniqueValueGenerator', () => {

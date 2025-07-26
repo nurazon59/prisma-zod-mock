@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseZodMockAnnotation, generateMockExpression } from './parseAnnotations';
+import { parseZodMockAnnotation, generateMockExpression } from './parse-annotations';
 import { createMockDMMFField } from '../../../tests/test-helpers';
 
 describe('parseZodMockAnnotation', () => {

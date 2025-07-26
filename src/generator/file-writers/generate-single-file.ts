@@ -2,8 +2,8 @@ import { GeneratorOptions } from '@prisma/generator-helper';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { GeneratorConfig } from '../config/types';
-import { generateZodSchema } from '../../templates/zodSchema';
-import { generateMockFactory } from '../../templates/mockFactory';
+import { generateZodSchema } from '../../templates/zod-schema';
+import { generateMockFactory } from '../../templates/mock-factory';
 
 export async function generateSingleFile(
   options: GeneratorOptions,

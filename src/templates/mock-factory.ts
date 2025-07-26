@@ -1,7 +1,7 @@
 import { DMMF } from '@prisma/generator-helper';
 import { GeneratorConfig } from '../generator/config/types';
-import { analyzeFieldName } from '../mock/semantics/fieldNameAnalyzer';
-import { parseZodMockAnnotation, generateMockExpression } from '../generator/utils/parseAnnotations';
+import { analyzeFieldName } from '../mock/semantics/field-name-analyzer';
+import { parseZodMockAnnotation, generateMockExpression } from '../generator/utils/parse-annotations';
 
 export function generateMockFactory(
   model: DMMF.Model,

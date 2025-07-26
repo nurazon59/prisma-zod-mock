@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generate } from '../src/generator/generatorHandler';
+import { generate } from '../src/generator/generator-handler';
 import { GeneratorOptions } from '@prisma/generator-helper';
 import * as fs from 'fs/promises';
 import * as path from 'path';

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GeneratorOptions } from '@prisma/generator-helper';
-import { generate } from './generatorHandler';
+import { generate } from './generator-handler';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 

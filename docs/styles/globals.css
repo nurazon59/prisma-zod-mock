@@ -1,1 +1,34 @@
-/* Nextraのデフォルトスタイルを使用 */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Nextraテーマのカスタマイズ */
+:root {
+  --nextra-primary-hue: 212;
+  --nextra-primary-saturation: 100%;
+}
+
+/* 追加のグローバルスタイル */
+html {
+  scroll-behavior: smooth;
+}
+
+/* コードブロックのスタイル調整 */
+pre {
+  overflow-x: auto;
+}
+
+/* リンクのホバーエフェクト */
+a {
+  transition: color 0.2s ease;
+}
+
+/* サイドバーのスタイル調整 */
+.nextra-sidebar-container {
+  scrollbar-width: thin;
+}
+
+/* ダークモード対応 */
+.dark {
+  --nextra-primary-hue: 212;
+}

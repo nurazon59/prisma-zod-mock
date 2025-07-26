@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateMockFactory } from '../src/templates/mockFactory';
+import { generateMockFactory } from '../src/templates/mock-factory';
 import { createMockDMMFModel, createMockDMMFField, createMockDMMF } from './test-helpers';
 
 describe('mockFactory with default values', () => {

@@ -8,10 +8,6 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  i18n: {
-    locales: ['ja'],
-    defaultLocale: 'ja',
-  },
 }
 
 module.exports = withNextra(nextConfig)

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { faker } from '@faker-js/faker';
-import { selectMockData, MockOptions } from './mockDataSelector';
+import { selectMockData, MockOptions } from './mock-data-selector';
 
 vi.mock('@faker-js/faker', () => ({
   faker: {

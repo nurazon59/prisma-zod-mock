@@ -1,9 +1,9 @@
 import { GeneratorOptions } from '@prisma/generator-helper';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { parseConfig } from './config/parseConfig';
-import { generateSingleFile } from './fileWriters/generateSingleFile';
-import { generateMultipleFiles } from './fileWriters/generateMultipleFiles';
+import { parseConfig } from './config/parse-config';
+import { generateSingleFile } from './file-writers/generate-single-file';
+import { generateMultipleFiles } from './file-writers/generate-multiple-files';
 
 export async function generate(options: GeneratorOptions): Promise<void> {
   const outputDir = options.generator.output?.value;

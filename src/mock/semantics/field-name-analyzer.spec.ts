@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { analyzeFieldName } from './fieldNameAnalyzer';
+import { analyzeFieldName } from './field-name-analyzer';
 
 describe('fieldNameAnalyzer', () => {
   describe('analyzeFieldName', () => {
