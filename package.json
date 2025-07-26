@@ -1,0 +1,61 @@
+{
+  "name": "prisma-zod-mock",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/prisma-zod-mock.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/prisma-zod-mock/issues"
+  },
+  "homepage": "https://github.com/yourusername/prisma-zod-mock#readme",
+  "description": "Generate Zod schemas and mock factories from Prisma schema",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "prisma-zod-mock": "dist/src/generator/bin.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:cov": "vitest --coverage",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "pnpm build && pnpm test && pnpm lint"
+  },
+  "keywords": [
+    "prisma",
+    "zod",
+    "mock",
+    "generator",
+    "typescript",
+    "testing"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@faker-js/faker": "^8.4.1",
+    "@prisma/generator-helper": "^5.14.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.2",
+    "@typescript-eslint/eslint-plugin": "^7.13.0",
+    "@typescript-eslint/parser": "^7.13.0",
+    "@vitest/coverage-v8": "^1.6.0",
+    "eslint": "^8.57.0",
+    "prettier": "^3.3.2",
+    "prisma": "^5.14.0",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  },
+  "peerDependencies": {
+    "prisma": ">=4.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
