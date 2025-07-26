@@ -213,7 +213,7 @@ describe('mockDataSelector', () => {
     });
 
     it('should throw error for unsupported field type', () => {
-      expect(() => selectMockData('unknown', 'UnsupportedType' as any)).toThrow(
+      expect(() => selectMockData('unknown', 'UnsupportedType' as string)).toThrow(
         'Unsupported field type: UnsupportedType'
       );
     });

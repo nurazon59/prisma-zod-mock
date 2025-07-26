@@ -1,0 +1,308 @@
+# サンプル
+
+実際のプロジェクトでprisma-zod-mockを使用する例を紹介します。
+
+## 基本的な例
+
+### ブログアプリケーション
+
+```prisma filename="schema.prisma"
+generator zodMock {
+  provider        = "prisma-zod-mock"
+  output         = "./generated/mocks"
+  mockDataLocale = "ja"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique /// @mock faker.internet.email()
+  name      String   /// @mock faker.person.fullName()
+  bio       String?  /// @mock faker.person.bio()
+  avatar    String?  /// @mock faker.image.avatar()
+  role      String   @default("USER") /// @mock.enum("USER", "ADMIN", "MODERATOR")
+  posts     Post[]
+  comments  Comment[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Post {
+  id          String     @id @default(cuid())
+  title       String     /// @mock faker.lorem.sentence()
+  content     String     /// @mock faker.lorem.paragraphs(3)
+  published   Boolean    @default(false)
+  viewCount   Int        @default(0) /// @mock.range(0, 10000)
+  author      User       @relation(fields: [authorId], references: [id])
+  authorId    String
+  comments    Comment[]
+  tags        Tag[]
+  createdAt   DateTime   @default(now())
+  publishedAt DateTime?
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String   /// @mock faker.lorem.paragraph()
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    String
+  createdAt DateTime @default(now())
+}
+
+model Tag {
+  id    String @id @default(cuid())
+  name  String @unique /// @mock.enum("技術", "プログラミング", "デザイン", "ビジネス", "ライフスタイル")
+  posts Post[]
+}
+```
+
+### 使用例
+
+```typescript filename="tests/blog.test.ts"
+import { describe, it, expect } from 'vitest';
+import { 
+  createUserMock, 
+  createPostMock, 
+  createPostMockBatch,
+  UserSchema,
+  PostSchema 
+} from './generated/mocks';
+
+describe('ブログ機能のテスト', () => {
+  it('ユーザーが投稿を作成できる', () => {
+    const user = createUserMock({ role: 'USER' });
+    const post = createPostMock({
+      authorId: user.id,
+      published: false
+    });
+    
+    expect(post.authorId).toBe(user.id);
+    expect(post.published).toBe(false);
+    expect(PostSchema.parse(post)).toEqual(post);
+  });
+  
+  it('管理者は複数の投稿を管理できる', () => {
+    const admin = createUserMock({ role: 'ADMIN' });
+    const posts = createPostMockBatch(10, {
+      authorId: admin.id,
+      published: true
+    });
+    
+    expect(posts).toHaveLength(10);
+    posts.forEach(post => {
+      expect(post.authorId).toBe(admin.id);
+      expect(post.published).toBe(true);
+    });
+  });
+});
+```
+
+## ECサイトの例
+
+```prisma filename="ecommerce/schema.prisma"
+generator zodMock {
+  provider             = "prisma-zod-mock"
+  output              = "./src/test-utils/mocks"
+  createRelationMocks = true
+  mockDataLocale      = "ja"
+}
+
+model Customer {
+  id            String   @id @default(cuid())
+  email         String   @unique /// @mock faker.internet.email()
+  firstName     String   /// @mock faker.person.firstName()
+  lastName      String   /// @mock faker.person.lastName()
+  phoneNumber   String?  /// @mock.pattern("0[0-9]{1,4}-[0-9]{1,4}-[0-9]{4}")
+  addresses     Address[]
+  orders        Order[]
+  cart          Cart?
+  membershipTier String  @default("BRONZE") /// @mock.enum("BRONZE", "SILVER", "GOLD", "PLATINUM")
+  points        Int     @default(0) /// @mock.range(0, 10000)
+  createdAt     DateTime @default(now())
+}
+
+model Product {
+  id           String   @id @default(cuid())
+  sku          String   @unique /// @mock.pattern("PRD-[A-Z]{3}-[0-9]{6}")
+  name         String   /// @mock faker.commerce.productName()
+  description  String   /// @mock faker.commerce.productDescription()
+  price        Float    /// @mock.range(100, 50000)
+  discountPrice Float?  /// @mock.range(50, 45000)
+  stock        Int      /// @mock.range(0, 1000)
+  category     Category @relation(fields: [categoryId], references: [id])
+  categoryId   String
+  images       ProductImage[]
+  orderItems   OrderItem[]
+  cartItems    CartItem[]
+  reviews      Review[]
+  tags         String[] /// @mock.enum("新商品", "セール", "限定品", "人気商品")
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  orderNumber     String      @unique /// @mock.pattern("ORD-[0-9]{8}")
+  customer        Customer    @relation(fields: [customerId], references: [id])
+  customerId      String
+  items           OrderItem[]
+  status          String      @default("PENDING") /// @mock.enum("PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED")
+  totalAmount     Float       /// @mock.range(1000, 100000)
+  shippingAddress Address     @relation(fields: [addressId], references: [id])
+  addressId       String
+  paymentMethod   String      /// @mock.enum("CREDIT_CARD", "DEBIT_CARD", "PAYPAL", "BANK_TRANSFER")
+  createdAt       DateTime    @default(now())
+  shippedAt       DateTime?
+  deliveredAt     DateTime?
+}
+```
+
+### テストでの活用例
+
+```typescript filename="ecommerce/tests/order.test.ts"
+import { 
+  createCustomerWithRelationsMock,
+  createProductMockBatch,
+  createOrderMock 
+} from '../src/test-utils/mocks';
+
+describe('注文処理', () => {
+  it('顧客が注文を作成できる', () => {
+    // リレーション付きの顧客を生成
+    const customer = createCustomerWithRelationsMock({
+      membershipTier: 'GOLD',
+      addresses: [
+        {
+          type: 'SHIPPING',
+          prefecture: '東京都',
+          city: '渋谷区'
+        }
+      ]
+    });
+    
+    // 商品を生成
+    const products = createProductMockBatch(3);
+    
+    // 注文を作成
+    const order = createOrderMock({
+      customerId: customer.id,
+      addressId: customer.addresses[0].id,
+      totalAmount: products.reduce((sum, p) => sum + p.price, 0)
+    });
+    
+    expect(order.customerId).toBe(customer.id);
+    expect(order.status).toBe('PENDING');
+  });
+});
+```
+
+## SaaSアプリケーションの例
+
+```typescript filename="saas/mock-factories.ts"
+import { 
+  createOrganizationMock,
+  createUserMock,
+  createProjectMock,
+  createSubscriptionMock 
+} from './generated';
+
+// 組織のセットアップ
+export function setupOrganization() {
+  const org = createOrganizationMock({
+    plan: 'ENTERPRISE'
+  });
+  
+  const owner = createUserMock({
+    organizationId: org.id,
+    role: 'OWNER'
+  });
+  
+  const members = createUserMockBatch(5, {
+    organizationId: org.id,
+    role: 'MEMBER'
+  });
+  
+  const projects = createProjectMockBatch(3, {
+    organizationId: org.id
+  });
+  
+  const subscription = createSubscriptionMock({
+    organizationId: org.id,
+    plan: 'ENTERPRISE',
+    status: 'ACTIVE'
+  });
+  
+  return {
+    organization: org,
+    owner,
+    members,
+    projects,
+    subscription
+  };
+}
+
+// テストで使用
+describe('組織管理', () => {
+  it('エンタープライズ組織の初期セットアップ', () => {
+    const { organization, owner, members, projects } = setupOrganization();
+    
+    expect(organization.plan).toBe('ENTERPRISE');
+    expect(owner.role).toBe('OWNER');
+    expect(members).toHaveLength(5);
+    expect(projects).toHaveLength(3);
+  });
+});
+```
+
+## APIモックサーバーの例
+
+```typescript filename="mock-server/handlers.ts"
+import { rest } from 'msw';
+import { setupServer } from 'msw/node';
+import { 
+  createUserMock,
+  createPostMockBatch,
+  createCommentMockBatch 
+} from './generated';
+
+const handlers = [
+  // ユーザー取得
+  rest.get('/api/users/:id', (req, res, ctx) => {
+    const { id } = req.params;
+    const user = createUserMock({ id: id as string });
+    return res(ctx.json(user));
+  }),
+  
+  // 投稿一覧
+  rest.get('/api/posts', (req, res, ctx) => {
+    const page = Number(req.url.searchParams.get('page') || 1);
+    const limit = Number(req.url.searchParams.get('limit') || 10);
+    
+    const posts = createPostMockBatch(limit, {
+      published: true
+    });
+    
+    return res(ctx.json({
+      data: posts,
+      page,
+      limit,
+      total: 100
+    }));
+  }),
+  
+  // コメント追加
+  rest.post('/api/posts/:postId/comments', async (req, res, ctx) => {
+    const { postId } = req.params;
+    const body = await req.json();
+    
+    const comment = createCommentMock({
+      postId: postId as string,
+      content: body.content,
+      authorId: body.authorId
+    });
+    
+    return res(ctx.status(201), ctx.json(comment));
+  })
+];
+
+export const server = setupServer(...handlers);
+```

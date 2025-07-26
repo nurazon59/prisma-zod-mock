@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { SemanticType } from './fieldNameAnalyzer';
+import { MockValue } from '../../runtime/types';
 
 export interface MockOptions {
   min?: number;
@@ -13,7 +14,7 @@ export function selectMockData(
   fieldType: string,
   fieldName?: string,
   options?: MockOptions
-): any {
+): MockValue {
   if (options?.seed) {
     faker.seed(options.seed);
   }
@@ -85,7 +86,7 @@ export function selectMockData(
   }
 }
 
-function generateByFieldType(fieldType: string, options?: MockOptions): any {
+function generateByFieldType(fieldType: string, options?: MockOptions): MockValue {
   switch (fieldType) {
     case 'String':
       return faker.string.alpha({ length: 10 });

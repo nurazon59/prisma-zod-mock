@@ -1,0 +1,12 @@
+{
+  "index": {
+    "title": "ホーム",
+    "type": "page"
+  },
+  "installation": "インストール",
+  "configuration": "設定",
+  "usage": "使い方",
+  "annotations": "アノテーション",
+  "examples": "サンプル",
+  "faq": "よくある質問"
+}

@@ -1,4 +1,4 @@
-import { GeneratorOptions } from '@prisma/generator-helper';
+import { GeneratorOptions, DMMF } from '@prisma/generator-helper';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { GeneratorConfig } from '../config/types';
@@ -52,13 +52,13 @@ export async function generateMultipleFiles(
   }
 }
 
-function generateSchemaFile(model: any, config: GeneratorConfig): string {
+function generateSchemaFile(model: DMMF.Model, config: GeneratorConfig): string {
   let content = "import { z } from 'zod';\n\n";
   content += generateZodSchema(model, config);
   return content;
 }
 
-function generateMockFile(model: any, config: GeneratorConfig, dmmf: any): string {
+function generateMockFile(model: DMMF.Model, config: GeneratorConfig, dmmf: DMMF.Document): string {
   let content = "import { faker } from '@faker-js/faker';\n";
 
   if (config.createZodSchemas) {

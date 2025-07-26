@@ -1,0 +1,58 @@
+# インストール
+
+## パッケージのインストール
+
+お好みのパッケージマネージャーを使用して、`prisma-zod-mock`を開発依存関係として追加します。
+
+```bash npm2yarn
+npm install --save-dev prisma-zod-mock
+```
+
+## 前提条件
+
+- Node.js 16.0 以上
+- Prisma 4.0 以上
+- TypeScript 4.5 以上（TypeScriptプロジェクトの場合）
+
+## Prismaスキーマの設定
+
+`schema.prisma`ファイルに以下のジェネレーター設定を追加します：
+
+```prisma filename="schema.prisma"
+generator zodMock {
+  provider = "prisma-zod-mock"
+  output   = "./generated"
+}
+```
+
+## 生成の実行
+
+設定が完了したら、Prismaのジェネレーターを実行します：
+
+```bash
+npx prisma generate
+```
+
+これにより、指定した出力ディレクトリ（デフォルトは`./generated`）に以下のファイルが生成されます：
+
+- `index.ts` - すべてのエクスポートを含むバレルファイル
+- Zodスキーマファイル
+- モックファクトリーファイル
+
+## TypeScript設定
+
+TypeScriptプロジェクトの場合、`tsconfig.json`に生成されたファイルのパスを含めることを推奨します：
+
+```json filename="tsconfig.json"
+{
+  "compilerOptions": {
+    "paths": {
+      "@/generated/*": ["./generated/*"]
+    }
+  }
+}
+```
+
+## 次のステップ
+
+インストールが完了したら、[設定](/configuration)ページで利用可能なオプションを確認してください。

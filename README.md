@@ -28,7 +28,7 @@ pnpm add -D prisma-zod-mock
 generator zodMock {
   provider                = "prisma-zod-mock"
   output                 = "./generated"
-  
+
   // オプション設定
   createZodSchemas       = true
   createMockFactories    = true
@@ -78,7 +78,7 @@ console.log(user);
 // カスタマイズしたモックデータ
 const customUser = createUserMock({
   name: 'Alice Smith',
-  email: 'alice@example.com'
+  email: 'alice@example.com',
 });
 
 // Zodスキーマでのバリデーション
@@ -90,40 +90,67 @@ const users = createUserMockBatch(10);
 
 ## 設定オプション
 
-| オプション | デフォルト | 説明 |
-|-----------|-----------|------|
-| `createZodSchemas` | `true` | Zodスキーマを生成するか |
-| `createMockFactories` | `true` | モックファクトリーを生成するか |
-| `useMultipleFiles` | `false` | 複数ファイルに分割して出力するか |
-| `writeBarrelFiles` | `true` | バレルファイル（index.ts）を生成するか |
-| `mockDataLocale` | `"en"` | Faker.jsのロケール設定 |
-| `mockDateRange` | `30` | 日付生成の範囲（日数） |
-| `createRelationMocks` | `true` | リレーション付きモックを生成するか |
+| オプション            | デフォルト | 説明                                   |
+| --------------------- | ---------- | -------------------------------------- |
+| `createZodSchemas`    | `true`     | Zodスキーマを生成するか                |
+| `createMockFactories` | `true`     | モックファクトリーを生成するか         |
+| `useMultipleFiles`    | `false`    | 複数ファイルに分割して出力するか       |
+| `writeBarrelFiles`    | `true`     | バレルファイル（index.ts）を生成するか |
+| `mockDataLocale`      | `"en"`     | Faker.jsのロケール設定                 |
+| `mockDateRange`       | `30`       | 日付生成の範囲（日数）                 |
+| `createRelationMocks` | `true`     | リレーション付きモックを生成するか     |
 
 ## フィールドレベルアノテーション
 
+`@mock`アノテーションを使用して、各フィールドのモック生成ロジックをカスタマイズできます。
+
+### 値生成の優先順位
+
+prisma-zod-mockは以下の優先順位で値を生成します：
+
+1. **@mockアノテーション** - 最優先
+2. **Prismaデフォルト値** - `@default("USER")`や`@default(true)`など
+3. **セマンティック推論** - フィールド名から自動判定
+
+### 基本的な使い方
+
 ```prisma
 model User {
-  // 特定のモック生成ロジックを指定
-  id        String   @id /// @mock.use(() => faker.string.uuid())
-  
-  // セマンティックタイプを明示
-  email     String   @unique /// @mock.semantic("email")
-  
-  // 数値範囲の指定
-  age       Int?     /// @mock.range(18, 80)
-  
-  // 日付範囲の指定
-  birthDate DateTime /// @mock.between("1950-01-01", "2005-12-31")
-  
-  // 配列の長さ指定
-  tags      String[] /// @mock.arrayLength(1, 5)
+  // Fakerのメソッドを直接指定
+  email     String   @unique /// @mock faker.internet.email()
+  name      String?  /// @mock faker.person.fullName()
   
   // 固定値
-  status    String   @default("active") /// @mock.fixed("active")
+  role      String   @default("USER") /// @mock "USER"
+  isActive  Boolean  /// @mock true
   
-  // モック生成から除外
-  password  String   /// @mock.omit()
+  // 数値の範囲指定
+  age       Int?     /// @mock.range(18, 100)
+  score     Float    /// @mock.range(0.0, 100.0)
+  
+  // 正規表現パターン
+  code      String   /// @mock.pattern("[A-Z]{3}-[0-9]{4}")
+  phone     String?  /// @mock.pattern("[0-9]{3}-[0-9]{4}-[0-9]{4}")
+  
+  // 選択肢からランダムに選択
+  country   String   /// @mock.enum("Japan", "USA", "UK", "France")
+  status    String   /// @mock.enum("active", "inactive", "pending")
+}
+```
+
+### デフォルト値の活用
+
+Prismaの`@default`属性が設定されている場合、モックでも同じ値を使用します：
+
+```prisma
+model Settings {
+  // @defaultの値がモックでも使用される
+  emailNotifications  Boolean  @default(true)   // モック: true
+  theme              String   @default("light") // モック: 'light'
+  maxRetries         Int      @default(3)       // モック: 3
+  
+  // @mockアノテーションがある場合はそちらを優先
+  language           String   @default("en") /// @mock "ja"  // モック: "ja"
 }
 ```
 

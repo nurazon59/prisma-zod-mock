@@ -22,7 +22,7 @@ export function parseConfig(options: GeneratorOptions): GeneratorConfig {
   booleanOptions.forEach((key) => {
     const value = options.generator.config[key];
     if (value !== undefined) {
-      (config as any)[key] = value === 'true';
+      (config[key as keyof GeneratorConfig] as boolean) = value === 'true';
     }
   });
 

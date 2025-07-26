@@ -1,14 +1,14 @@
 import { DMMF } from '@prisma/generator-helper';
 
 export class UniqueValueGenerator {
-  private usedValues = new Map<string, Set<any>>();
+  private usedValues = new Map<string, Set<unknown>>();
   private readonly maxAttempts = 1000;
 
-  generateUnique(field: DMMF.Field, modelName: string, generator: () => any): any {
+  generateUnique<T>(field: DMMF.Field, modelName: string, generator: () => T): T {
     const key = `${modelName}.${field.name}`;
     const usedSet = this.usedValues.get(key) || new Set();
 
-    let value: any;
+    let value: T;
     let attempts = 0;
 
     do {
@@ -37,7 +37,7 @@ export class UniqueValueGenerator {
     this.usedValues.delete(key);
   }
 
-  getUsedValues(modelName: string, fieldName: string): Set<any> {
+  getUsedValues(modelName: string, fieldName: string): Set<unknown> {
     const key = `${modelName}.${fieldName}`;
     return this.usedValues.get(key) || new Set();
   }

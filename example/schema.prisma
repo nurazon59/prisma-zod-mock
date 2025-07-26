@@ -14,42 +14,86 @@ generator zodMock {
 
 model User {
   id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  age       Int?
-  bio       String?
-  avatar    String?
+  email     String   @unique /// @mock faker.internet.email()
+  name      String?  /// @mock faker.person.fullName()
+  age       Int?     /// @mock.range(18, 100)
+  bio       String?  /// @mock faker.lorem.paragraph()
+  avatar    String?  /// @mock faker.image.avatarGitHub()
+  role      Role     @default(USER) /// @mock "USER"
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   posts     Post[]
   profile   Profile?
+  settings  UserSettings?
 }
 
 model Profile {
   id          String  @id @default(cuid())
   userId      String  @unique
   user        User    @relation(fields: [userId], references: [id])
-  phoneNumber String?
-  address     String?
-  city        String?
-  country     String?
-  zipCode     String?
+  phoneNumber String? /// @mock.pattern("[0-9]{3}-[0-9]{4}-[0-9]{4}")
+  address     String? /// @mock faker.location.streetAddress({ useFullAddress: true })
+  city        String? /// @mock faker.location.city()
+  country     String? /// @mock.enum("Japan", "USA", "UK", "France", "Germany")
+  zipCode     String? /// @mock.pattern("[0-9]{3}-[0-9]{4}")
+  birthDate   DateTime? /// @mock faker.date.birthdate({ min: 18, max: 80, mode: 'age' })
+  website     String? /// @mock faker.internet.url()
 }
 
 model Post {
   id          String    @id @default(cuid())
-  title       String
-  content     String?
-  published   Boolean   @default(false)
+  title       String    /// @mock faker.lorem.sentence({ min: 5, max: 10 })
+  slug        String    @unique /// @mock faker.lorem.slug()
+  content     String?   /// @mock faker.lorem.paragraphs({ min: 3, max: 5 })
+  published   Boolean   @default(false) /// @mock faker.datatype.boolean({ probability: 0.7 })
+  views       Int       @default(0) /// @mock.range(0, 10000)
   author      User      @relation(fields: [authorId], references: [id])
   authorId    String
   categories  Category[]
+  tags        Tag[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  publishedAt DateTime? /// @mock faker.date.recent({ days: 30 })
 }
 
 model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique /// @mock faker.lorem.word()
+  slug        String   @unique /// @mock faker.lorem.slug()
+  description String?  /// @mock faker.lorem.sentence()
+  posts       Post[]
+  parentId    String?
+  parent      Category? @relation("CategoryToCategory", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryToCategory")
+}
+
+model Tag {
   id    String @id @default(cuid())
-  name  String @unique
+  name  String @unique /// @mock faker.word.adjective()
   posts Post[]
+}
+
+model UserSettings {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id])
+  theme               Theme    @default(LIGHT) /// @mock "LIGHT"
+  emailNotifications  Boolean  @default(true) /// @mock true
+  pushNotifications   Boolean  @default(false) /// @mock false
+  language            String   @default("ja") /// @mock.enum("ja", "en", "zh", "ko")
+  timezone            String   @default("Asia/Tokyo") /// @mock "Asia/Tokyo"
+  weeklyReportEnabled Boolean  @default(true) /// @mock faker.datatype.boolean()
+  marketingEmails     Boolean  @default(false) /// @mock false
+}
+
+enum Role {
+  USER
+  ADMIN
+  MODERATOR
+}
+
+enum Theme {
+  LIGHT
+  DARK
+  SYSTEM
 }

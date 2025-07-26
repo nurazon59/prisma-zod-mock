@@ -1,13 +1,14 @@
 import { DMMF } from '@prisma/generator-helper';
 import { GeneratorConfig } from '../generator/config/types';
 import { analyzeFieldName } from '../mock/semantics/fieldNameAnalyzer';
+import { parseZodMockAnnotation, generateMockExpression } from '../generator/utils/parseAnnotations';
 
 export function generateMockFactory(
   model: DMMF.Model,
   config: GeneratorConfig,
   _dmmf: DMMF.Document
 ): string {
-  const modelType = config.createZodSchemas ? model.name : `any`;
+  const modelType = config.createZodSchemas ? model.name : `Record<string, unknown>`;
 
   let factory = `export const create${model.name}Mock = (overrides?: Partial<${modelType}>): ${modelType} => {\n`;
   factory += '  return {\n';
@@ -42,10 +43,19 @@ export function generateMockFactory(
 }
 
 function generateFieldMockValue(field: DMMF.Field, config: GeneratorConfig): string {
-  const semanticType = analyzeFieldName(field.name);
+  // Check for @mock annotations first
+  const annotation = parseZodMockAnnotation(field);
+  if (annotation) {
+    const mockValue = generateMockExpression(annotation, field);
+    if (!field.isRequired) {
+      return `Math.random() > 0.5 ? ${mockValue} : null`;
+    }
+    return mockValue;
+  }
 
-  // Handle default values
-  if (field.hasDefaultValue && field.default) {
+  // Handle Prisma default values
+  if (field.hasDefaultValue && field.default !== null && field.default !== undefined) {
+    // Handle function defaults
     if (typeof field.default === 'object' && 'name' in field.default) {
       switch (field.default.name) {
         case 'now':
@@ -56,9 +66,26 @@ function generateFieldMockValue(field: DMMF.Field, config: GeneratorConfig): str
           return 'faker.string.uuid()';
         case 'autoincrement':
           return 'faker.number.int({ min: 1, max: 100000 })';
+        case 'dbgenerated':
+          // For database generated values, fall through to semantic generation
+          break;
+        default:
+          // For unknown function defaults, fall through
+          break;
+      }
+    } else {
+      // Handle static defaults (string, number, boolean)
+      const defaultValue = field.default;
+      if (typeof defaultValue === 'string') {
+        return `'${defaultValue}'`;
+      } else if (typeof defaultValue === 'number' || typeof defaultValue === 'boolean') {
+        return String(defaultValue);
       }
     }
   }
+
+  // Semantic type analysis as fallback
+  const semanticType = analyzeFieldName(field.name);
 
   // Generate based on semantic type
   const mockValue = getMockValueCode(semanticType, field.type, field.name, config);

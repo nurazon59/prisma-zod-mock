@@ -1,0 +1,225 @@
+# Zodスキーマ API
+
+生成されるZodスキーマのAPIリファレンスです。
+
+## 基本スキーマ
+
+各Prismaモデルに対して、対応するZodスキーマが生成されます。
+
+### モデルスキーマ
+
+```typescript
+// Prismaモデル
+model User {
+  id        String   @id
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+}
+
+// 生成されるZodスキーマ
+export const UserSchema = z.object({
+  id: z.string(),
+  email: z.string(),
+  name: z.string().nullable(),
+  createdAt: z.date()
+});
+```
+
+## スキーマの使用方法
+
+### バリデーション
+
+```typescript
+import { UserSchema } from './generated';
+
+// データのバリデーション
+const userData = {
+  id: '123',
+  email: 'user@example.com',
+  name: 'John Doe',
+  createdAt: new Date()
+};
+
+const validatedUser = UserSchema.parse(userData);
+```
+
+### 安全なパース
+
+```typescript
+const result = UserSchema.safeParse(userData);
+
+if (result.success) {
+  console.log('Valid data:', result.data);
+} else {
+  console.log('Validation errors:', result.error.errors);
+}
+```
+
+### 部分的なバリデーション
+
+```typescript
+// 部分的なスキーマ
+const PartialUserSchema = UserSchema.partial();
+
+// オプショナルなフィールドでバリデーション
+const partialUser = PartialUserSchema.parse({
+  email: 'user@example.com'
+});
+```
+
+## 入力スキーマ
+
+作成や更新用の入力スキーマも生成されます。
+
+### CreateInputスキーマ
+
+```typescript
+export const UserCreateInputSchema = z.object({
+  email: z.string(),
+  name: z.string().optional(),
+  // idとcreatedAtは自動生成されるため含まれない
+});
+```
+
+### UpdateInputスキーマ
+
+```typescript
+export const UserUpdateInputSchema = z.object({
+  email: z.string().optional(),
+  name: z.string().nullable().optional(),
+});
+```
+
+## リレーションスキーマ
+
+リレーションを含むスキーマも生成されます。
+
+```typescript
+// リレーションを含むスキーマ
+export const UserWithRelationsSchema = z.object({
+  id: z.string(),
+  email: z.string(),
+  name: z.string().nullable(),
+  createdAt: z.date(),
+  posts: z.array(PostSchema)
+});
+```
+
+## カスタムバリデーション
+
+生成されたスキーマを拡張してカスタムバリデーションを追加できます。
+
+### メールフォーマットの検証
+
+```typescript
+const CustomUserSchema = UserSchema.extend({
+  email: z.string().email('有効なメールアドレスを入力してください')
+});
+```
+
+### 条件付きバリデーション
+
+```typescript
+const ConditionalUserSchema = UserSchema.refine(
+  (data) => {
+    // 名前がある場合は3文字以上
+    return !data.name || data.name.length >= 3;
+  },
+  {
+    message: '名前は3文字以上で入力してください',
+    path: ['name']
+  }
+);
+```
+
+### 変換付きスキーマ
+
+```typescript
+const TransformUserSchema = UserSchema.transform((data) => ({
+  ...data,
+  displayName: data.name || data.email
+}));
+```
+
+## 型の抽出
+
+Zodスキーマから TypeScript の型を抽出できます。
+
+```typescript
+import { z } from 'zod';
+import { UserSchema } from './generated';
+
+// スキーマから型を抽出
+type User = z.infer<typeof UserSchema>;
+
+// 入力型の抽出
+type UserInput = z.input<typeof UserSchema>;
+
+// 出力型の抽出
+type UserOutput = z.output<typeof UserSchema>;
+```
+
+## エラーハンドリング
+
+### エラーメッセージのカスタマイズ
+
+```typescript
+const CustomErrorSchema = z.object({
+  email: z.string({
+    required_error: 'メールアドレスは必須です',
+    invalid_type_error: 'メールアドレスは文字列である必要があります'
+  }).email('有効なメールアドレスを入力してください'),
+  
+  age: z.number({
+    required_error: '年齢は必須です',
+    invalid_type_error: '年齢は数値である必要があります'
+  }).min(0, '年齢は0以上である必要があります')
+    .max(150, '年齢は150以下である必要があります')
+});
+```
+
+### エラーのフォーマット
+
+```typescript
+try {
+  UserSchema.parse(invalidData);
+} catch (error) {
+  if (error instanceof z.ZodError) {
+    // フィールドごとのエラーを取得
+    const fieldErrors = error.flatten().fieldErrors;
+    console.log(fieldErrors);
+    // {
+    //   email: ['有効なメールアドレスを入力してください'],
+    //   name: ['必須フィールドです']
+    // }
+  }
+}
+```
+
+## ユーティリティ
+
+### スキーマのマージ
+
+```typescript
+const ExtendedUserSchema = UserSchema.merge(
+  z.object({
+    role: z.enum(['USER', 'ADMIN']),
+    permissions: z.array(z.string())
+  })
+);
+```
+
+### スキーマの選択
+
+```typescript
+// 特定のフィールドのみ選択
+const UserEmailSchema = UserSchema.pick({
+  email: true
+});
+
+// 特定のフィールドを除外
+const UserWithoutIdSchema = UserSchema.omit({
+  id: true
+});
+```
