@@ -1,5 +1,4 @@
 export interface GeneratorConfig {
-  // Zod schema generation options
   createZodSchemas: boolean;
   useMultipleFiles: boolean;
   writeBarrelFiles: boolean;
@@ -9,7 +8,6 @@ export interface GeneratorConfig {
   useDefaultValidators: boolean;
   coerceDate: boolean;
 
-  // Mock generation options
   createMockFactories: boolean;
   mockDataLocale: string;
   mockSeed?: number;
@@ -19,7 +17,6 @@ export interface GeneratorConfig {
 }
 
 export const defaultConfig: GeneratorConfig = {
-  // Zod schema generation options
   createZodSchemas: true,
   useMultipleFiles: false,
   writeBarrelFiles: true,
@@ -29,7 +26,6 @@ export const defaultConfig: GeneratorConfig = {
   useDefaultValidators: true,
   coerceDate: true,
 
-  // Mock generation options
   createMockFactories: true,
   mockDataLocale: 'en',
   mockSeed: undefined,

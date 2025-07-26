@@ -18,19 +18,16 @@ export function parseZodMockAnnotation(field: DMMF.Field): ZodMockAnnotation | n
   for (const line of lines) {
     const trimmed = line.trim();
     
-    // カスタムFaker式: @mock faker.internet.email()
     if (trimmed.startsWith('@mock faker.')) {
       const expression = trimmed.substring('@mock '.length).trim();
       return { type: 'faker', value: expression };
     }
     
-    // 固定値: @mock "固定の値" または @mock 123
     if (trimmed.startsWith('@mock ') && !trimmed.includes('faker.')) {
       const value = trimmed.substring('@mock '.length).trim();
       return { type: 'fixed', value };
     }
     
-    // 範囲指定: @mock.range(18, 100)
     const rangeMatch = trimmed.match(/@mock\.range\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)/);
     if (rangeMatch) {
       return {
@@ -40,13 +37,11 @@ export function parseZodMockAnnotation(field: DMMF.Field): ZodMockAnnotation | n
       };
     }
     
-    // パターン: @mock.pattern("[A-Z]{3}-[0-9]{4}")
     const patternMatch = trimmed.match(/@mock\.pattern\s*\(\s*["'](.+?)["']\s*\)/);
     if (patternMatch) {
       return { type: 'pattern', pattern: patternMatch[1] };
     }
     
-    // Enum選択: @mock.enum("red", "blue", "green")
     const enumMatch = trimmed.match(/@mock\.enum\s*\((.+)\)/);
     if (enumMatch) {
       const options = enumMatch[1]

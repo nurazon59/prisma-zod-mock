@@ -1,43 +1,30 @@
-export type SemanticType =
-  | 'email'
-  | 'name'
-  | 'phone'
-  | 'address'
-  | 'url'
-  | 'description'
-  | 'title'
-  | 'date'
-  | 'image'
-  | 'price'
-  | 'country'
-  | 'company'
-  | 'unknown';
-
-interface PatternMapping {
-  [key: string]: RegExp;
+export interface FieldAnalysis {
+  fieldName: string
+  inferredType?: string
+  patterns: string[]
 }
 
-const patterns: PatternMapping = {
-  email: /email|mail/i,
-  phone: /phone|tel|mobile/i,
-  address: /address|street|city|zip|postal/i,
-  image: /image|avatar|photo|picture/i,
-  url: /url|website|link|homepage/i,
-  description: /description|desc|bio|about|summary/i,
-  title: /title|heading|subject|headline/i,
-  date: /date|createdAt|updatedAt|deletedAt|publishedAt|birthDate/i,
-  price: /price|cost|amount|total|subtotal|fee/i,
-  country: /country/i,
-  company: /company|organization|employer/i,
-  name: /name|firstName|lastName/i,
-};
+export function analyzeFieldName(fieldName: string): FieldAnalysis {
+  const lowerFieldName = fieldName.toLowerCase()
+  const patterns: string[] = []
 
-export function analyzeFieldName(fieldName: string): SemanticType {
-  for (const [type, pattern] of Object.entries(patterns)) {
-    if (pattern.test(fieldName)) {
-      return type as SemanticType;
-    }
+  if (lowerFieldName.includes('email')) patterns.push('email')
+  if (lowerFieldName.includes('phone')) patterns.push('phone')
+  if (lowerFieldName.includes('url') || lowerFieldName.includes('website')) patterns.push('url')
+  if (lowerFieldName.includes('name')) patterns.push('name')
+  if (lowerFieldName.includes('address')) patterns.push('address')
+  if (lowerFieldName.includes('city')) patterns.push('city')
+  if (lowerFieldName.includes('country')) patterns.push('country')
+  if (lowerFieldName.includes('zip') || lowerFieldName.includes('postal')) patterns.push('zip')
+
+  let inferredType: string | undefined
+  if (patterns.includes('email')) inferredType = 'email'
+  else if (patterns.includes('phone')) inferredType = 'phone'
+  else if (patterns.includes('url')) inferredType = 'url'
+
+  return {
+    fieldName,
+    inferredType,
+    patterns
   }
-
-  return 'unknown';
 }

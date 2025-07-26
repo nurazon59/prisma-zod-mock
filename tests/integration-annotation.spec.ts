@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { generateMockFactory } from '../src/templates/mock-factory';
 import { createMockDMMFModel, createMockDMMFField, createMockDMMF } from './test-helpers';
+import { defaultConfig } from '../src/generator/config/types';
 
 describe('mockFactory with annotations', () => {
   it('should use @zod-mock annotation when present', () => {
@@ -22,7 +23,7 @@ describe('mockFactory with annotations', () => {
     });
 
     const dmmf = createMockDMMF();
-    const config = { createZodSchemas: false, mockDateRange: 30 };
+    const config = { ...defaultConfig, createZodSchemas: false, mockDateRange: 30 };
 
     const result = generateMockFactory(model, config, dmmf);
 
@@ -43,7 +44,7 @@ describe('mockFactory with annotations', () => {
     });
 
     const dmmf = createMockDMMF();
-    const config = { createZodSchemas: false, mockDateRange: 30 };
+    const config = { ...defaultConfig, createZodSchemas: false, mockDateRange: 30 };
 
     const result = generateMockFactory(model, config, dmmf);
 
@@ -62,7 +63,7 @@ describe('mockFactory with annotations', () => {
     });
 
     const dmmf = createMockDMMF();
-    const config = { createZodSchemas: false, mockDateRange: 30 };
+    const config = { ...defaultConfig, createZodSchemas: false, mockDateRange: 30 };
 
     const result = generateMockFactory(model, config, dmmf);
 
@@ -82,7 +83,7 @@ describe('mockFactory with annotations', () => {
     });
 
     const dmmf = createMockDMMF();
-    const config = { createZodSchemas: false, mockDateRange: 30 };
+    const config = { ...defaultConfig, createZodSchemas: false, mockDateRange: 30 };
 
     const result = generateMockFactory(model, config, dmmf);
 

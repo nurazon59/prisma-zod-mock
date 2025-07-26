@@ -10,7 +10,6 @@ export async function generateMultipleFiles(
   config: GeneratorConfig,
   outputDir: string
 ): Promise<void> {
-  // Create subdirectories
   const schemasDir = path.join(outputDir, 'schemas');
   const mocksDir = path.join(outputDir, 'mocks');
 
@@ -24,11 +23,9 @@ export async function generateMultipleFiles(
 
   const exports: string[] = [];
 
-  // Generate files for each model
   for (const model of options.dmmf.datamodel.models) {
     const modelNameLower = model.name.toLowerCase();
 
-    // Generate schema file
     if (config.createZodSchemas) {
       const schemaContent = generateSchemaFile(model, config);
       const schemaPath = path.join(schemasDir, `${modelNameLower}.ts`);
@@ -36,7 +33,6 @@ export async function generateMultipleFiles(
       exports.push(`export * from './schemas/${modelNameLower}';`);
     }
 
-    // Generate mock file
     if (config.createMockFactories) {
       const mockContent = generateMockFile(model, config, options.dmmf);
       const mockPath = path.join(mocksDir, `${modelNameLower}.mock.ts`);
@@ -45,7 +41,6 @@ export async function generateMultipleFiles(
     }
   }
 
-  // Generate barrel file
   if (config.writeBarrelFiles && exports.length > 0) {
     const indexPath = path.join(outputDir, 'index.ts');
     await fs.writeFile(indexPath, exports.join('\n') + '\n', 'utf-8');

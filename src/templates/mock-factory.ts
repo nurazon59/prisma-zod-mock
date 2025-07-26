@@ -23,7 +23,6 @@ export function generateMockFactory(
   factory += '  };\n';
   factory += '};\n\n';
 
-  // Generate batch factory
   factory += `export const create${model.name}MockBatch = (\n`;
   factory += `  count: number = 10,\n`;
   factory += `  overrides?: Partial<${modelType}>\n`;
@@ -43,7 +42,6 @@ export function generateMockFactory(
 }
 
 function generateFieldMockValue(field: DMMF.Field, config: GeneratorConfig): string {
-  // Check for @mock annotations first
   const annotation = parseZodMockAnnotation(field);
   if (annotation) {
     const mockValue = generateMockExpression(annotation, field);
@@ -53,9 +51,7 @@ function generateFieldMockValue(field: DMMF.Field, config: GeneratorConfig): str
     return mockValue;
   }
 
-  // Handle Prisma default values
   if (field.hasDefaultValue && field.default !== null && field.default !== undefined) {
-    // Handle function defaults
     if (typeof field.default === 'object' && 'name' in field.default) {
       switch (field.default.name) {
         case 'now':
@@ -67,14 +63,11 @@ function generateFieldMockValue(field: DMMF.Field, config: GeneratorConfig): str
         case 'autoincrement':
           return 'faker.number.int({ min: 1, max: 100000 })';
         case 'dbgenerated':
-          // For database generated values, fall through to semantic generation
           break;
         default:
-          // For unknown function defaults, fall through
           break;
       }
     } else {
-      // Handle static defaults (string, number, boolean)
       const defaultValue = field.default;
       if (typeof defaultValue === 'string') {
         return `'${defaultValue}'`;
@@ -84,11 +77,9 @@ function generateFieldMockValue(field: DMMF.Field, config: GeneratorConfig): str
     }
   }
 
-  // Semantic type analysis as fallback
-  const semanticType = analyzeFieldName(field.name);
+  const analysis = analyzeFieldName(field.name);
 
-  // Generate based on semantic type
-  const mockValue = getMockValueCode(semanticType, field.type, field.name, config);
+  const mockValue = getMockValueCode(analysis.inferredType || field.type, field.type, field.name, config);
 
   if (!field.isRequired) {
     return `Math.random() > 0.5 ? ${mockValue} : null`;

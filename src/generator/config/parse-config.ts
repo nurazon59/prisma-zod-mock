@@ -4,7 +4,6 @@ import { GeneratorConfig, defaultConfig } from './types';
 export function parseConfig(options: GeneratorOptions): GeneratorConfig {
   const config = { ...defaultConfig };
 
-  // Parse boolean options
   const booleanOptions: (keyof GeneratorConfig)[] = [
     'createZodSchemas',
     'useMultipleFiles',
@@ -26,7 +25,6 @@ export function parseConfig(options: GeneratorOptions): GeneratorConfig {
     }
   });
 
-  // Parse string options
   if (options.generator.config.mockDataLocale) {
     const locale = options.generator.config.mockDataLocale;
     if (typeof locale === 'string') {
@@ -34,7 +32,6 @@ export function parseConfig(options: GeneratorOptions): GeneratorConfig {
     }
   }
 
-  // Parse number options
   if (options.generator.config.mockSeed) {
     const seed = options.generator.config.mockSeed;
     if (typeof seed === 'string') {

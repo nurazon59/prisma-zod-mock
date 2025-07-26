@@ -12,22 +12,17 @@ export async function generateSingleFile(
 ): Promise<void> {
   let content = '';
 
-  // Add imports
   content += generateImports(config);
   content += '\n\n';
 
-  // Generate Zod schemas
   if (config.createZodSchemas) {
-    content += '// ===== Zod Schemas =====\n';
     for (const model of options.dmmf.datamodel.models) {
       content += generateZodSchema(model, config);
       content += '\n\n';
     }
   }
 
-  // Generate mock factories
   if (config.createMockFactories) {
-    content += '// ===== Mock Factories =====\n';
     for (const model of options.dmmf.datamodel.models) {
       content += generateMockFactory(model, config, options.dmmf);
       content += '\n\n';

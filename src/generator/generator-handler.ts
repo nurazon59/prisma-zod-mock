@@ -15,7 +15,6 @@ export async function generate(options: GeneratorOptions): Promise<void> {
   const config = parseConfig(options);
   const resolvedOutputDir = path.resolve(outputDir);
 
-  // Create output directory
   await fs.mkdir(resolvedOutputDir, { recursive: true });
 
   if (config.useMultipleFiles) {
