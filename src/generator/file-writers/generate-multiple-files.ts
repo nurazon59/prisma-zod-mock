@@ -48,7 +48,23 @@ export async function generateMultipleFiles(
 }
 
 function generateSchemaFile(model: DMMF.Model, config: GeneratorConfig): string {
-  let content = "import { z } from 'zod';\n\n";
+  let content = "import { z } from 'zod';\n";
+  
+  // リレーションフィールドがある場合は、関連するスキーマをインポート
+  const relatedModels = new Set<string>();
+  for (const field of model.fields) {
+    if (field.kind === 'object' && field.type !== model.name) {
+      relatedModels.add(field.type);
+    }
+  }
+  
+  if (relatedModels.size > 0) {
+    for (const relatedModel of relatedModels) {
+      content += `import { ${relatedModel}Schema } from './${relatedModel.toLowerCase()}';\n`;
+    }
+  }
+  
+  content += '\n';
   content += generateZodSchema(model, config);
   return content;
 }

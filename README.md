@@ -7,7 +7,7 @@ An integrated library that automatically generates Zod validation schemas and mo
 - 🚀 Automatically generate Zod schemas from Prisma schemas
 - 🎯 Type-safe mock data factory generation
 - 🧠 Realistic data generation through semantic inference from field names
-- 🔗 Consistent data generation considering relations
+- 🔗 Support for Prisma relations and enums
 - ⚡ zod-prisma-types compatible options
 
 ## Installation
@@ -170,6 +170,115 @@ Automatically infers data types from field names:
 - `price`, `cost`, `amount` → Prices
 - `country` → Country names
 - `company`, `organization` → Company names
+
+## Relations and Enums
+
+### Enum Support
+
+Enums are automatically converted to TypeScript const objects and Zod native enums:
+
+```prisma
+enum Role {
+  ADMIN
+  USER
+  MODERATOR
+}
+
+model User {
+  id    String @id @default(cuid())
+  name  String
+  role  Role   @default(USER)
+}
+```
+
+Generated code:
+
+```typescript
+// Enum definition
+export const Role = {
+  ADMIN: 'ADMIN',
+  USER: 'USER',
+  MODERATOR: 'MODERATOR'
+} as const;
+
+export type Role = typeof Role[keyof typeof Role];
+
+// Zod schema
+export const UserSchema = z.object({
+  id: z.string().cuid().optional(),
+  name: z.string(),
+  role: z.nativeEnum(Role).optional()
+});
+
+// Mock factory generates random enum values
+const user = createUserMock();
+// user.role will be one of: 'ADMIN', 'USER', 'MODERATOR'
+```
+
+### Relation Support
+
+Relations are included in Zod schemas and handled appropriately in mock factories:
+
+```prisma
+model User {
+  id      String    @id @default(cuid())
+  email   String    @unique
+  posts   Post[]
+  profile Profile?
+}
+
+model Post {
+  id       String   @id @default(cuid())
+  title    String
+  author   User     @relation(fields: [authorId], references: [id])
+  authorId String
+}
+
+model Profile {
+  id     String @id @default(cuid())
+  bio    String?
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique
+}
+```
+
+Generated Zod schemas:
+
+```typescript
+export const UserSchema = z.object({
+  id: z.string().cuid().optional(),
+  email: z.string().email(),
+  posts: z.array(PostSchema).nullable(),
+  profile: ProfileSchema.nullable()
+});
+
+export const PostSchema = z.object({
+  id: z.string().cuid().optional(),
+  title: z.string(),
+  author: UserSchema,
+  authorId: z.string()
+});
+```
+
+Mock factories handle relations intelligently to avoid circular references:
+
+```typescript
+const user = createUserMock();
+// {
+//   id: 'clh3k4n5j0000qw8w5h3k4n5j',
+//   email: 'test@example.com',
+//   posts: [],  // Empty array for one-to-many
+//   profile: null  // null for optional one-to-one
+// }
+
+const post = createPostMock();
+// {
+//   id: 'clh3k4n5j0001qw8w5h3k4n5k',
+//   title: 'Example Title',
+//   author: { id: 'clh3k4n5j0002qw8w5h3k4n5l' },  // Only ID for required relations
+//   authorId: 'clh3k4n5j0002qw8w5h3k4n5l'
+// }
+```
 
 ## Development
 

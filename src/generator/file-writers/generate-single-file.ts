@@ -12,8 +12,17 @@ export async function generateSingleFile(
 ): Promise<void> {
   let content = '';
 
-  content += generateImports(config);
+  content += generateImports(config, options.dmmf);
   content += '\n\n';
+  
+  // Enum定義を先に生成
+  if (config.createZodSchemas && options.dmmf.datamodel.enums.length > 0) {
+    content += '// Enums\n';
+    for (const enumDef of options.dmmf.datamodel.enums) {
+      content += generateEnumDefinition(enumDef);
+      content += '\n\n';
+    }
+  }
 
   if (config.createZodSchemas) {
     for (const model of options.dmmf.datamodel.models) {
@@ -33,7 +42,7 @@ export async function generateSingleFile(
   await fs.writeFile(outputPath, content, 'utf-8');
 }
 
-function generateImports(config: GeneratorConfig): string {
+function generateImports(config: GeneratorConfig, _dmmf: GeneratorOptions['dmmf']): string {
   const imports: string[] = [];
 
   if (config.createZodSchemas) {
@@ -45,4 +54,17 @@ function generateImports(config: GeneratorConfig): string {
   }
 
   return imports.join('\n');
+}
+
+function generateEnumDefinition(enumDef: GeneratorOptions['dmmf']['datamodel']['enums'][0]): string {
+  let content = `export const ${enumDef.name} = {\n`;
+  
+  for (const value of enumDef.values) {
+    content += `  ${value.name}: '${value.name}',\n`;
+  }
+  
+  content += '} as const;\n\n';
+  content += `export type ${enumDef.name} = typeof ${enumDef.name}[keyof typeof ${enumDef.name}];`;
+  
+  return content;
 }

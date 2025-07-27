@@ -7,6 +7,10 @@ export function generateZodSchema(model: DMMF.Model, config: GeneratorConfig): s
   for (const field of model.fields) {
     if (field.kind === 'scalar') {
       schema += `  ${field.name}: ${generateFieldSchema(field, config)},\n`;
+    } else if (field.kind === 'object') {
+      schema += `  ${field.name}: ${generateRelationFieldSchema(field, config)},\n`;
+    } else if (field.kind === 'enum') {
+      schema += `  ${field.name}: ${generateEnumFieldSchema(field, config)},\n`;
     }
   }
 
@@ -78,5 +82,46 @@ function generateFieldSchema(field: DMMF.Field, config: GeneratorConfig): string
     schema += '.optional()';
   }
 
+  return schema;
+}
+
+function generateRelationFieldSchema(field: DMMF.Field, _config: GeneratorConfig): string {
+  let schema = '';
+  
+  // リレーション先のモデルのスキーマを参照
+  const relatedModelSchema = `${field.type}Schema`;
+  
+  if (field.isList) {
+    schema = `z.array(${relatedModelSchema})`;
+  } else {
+    schema = relatedModelSchema;
+  }
+  
+  if (!field.isRequired) {
+    schema += '.nullable()';
+  }
+  
+  if (field.hasDefaultValue) {
+    schema += '.optional()';
+  }
+  
+  return schema;
+}
+
+function generateEnumFieldSchema(field: DMMF.Field, _config: GeneratorConfig): string {
+  let schema = `z.nativeEnum(${field.type})`;
+  
+  if (field.isList) {
+    schema = `z.array(${schema})`;
+  }
+  
+  if (!field.isRequired) {
+    schema += '.nullable()';
+  }
+  
+  if (field.hasDefaultValue) {
+    schema += '.optional()';
+  }
+  
   return schema;
 }

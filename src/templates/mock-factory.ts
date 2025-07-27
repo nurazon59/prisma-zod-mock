@@ -9,7 +9,7 @@ import {
 export function generateMockFactory(
   model: DMMF.Model,
   config: GeneratorConfig,
-  _dmmf: DMMF.Document
+  dmmf: DMMF.Document
 ): string {
   const modelType = config.createZodSchemas ? model.name : `Record<string, unknown>`;
 
@@ -19,6 +19,10 @@ export function generateMockFactory(
   for (const field of model.fields) {
     if (field.kind === 'scalar') {
       factory += `    ${field.name}: ${generateFieldMockValue(field, config)},\n`;
+    } else if (field.kind === 'object') {
+      factory += `    ${field.name}: ${generateRelationMockValue(field, config, dmmf)},\n`;
+    } else if (field.kind === 'enum') {
+      factory += `    ${field.name}: ${generateEnumMockValue(field, config, dmmf)},\n`;
     }
   }
 
@@ -167,4 +171,59 @@ function getDefaultMockValueCode(fieldType: string, config: GeneratorConfig): st
     default:
       return 'null';
   }
+}
+
+function generateRelationMockValue(field: DMMF.Field, config: GeneratorConfig, dmmf: DMMF.Document): string {
+  // リレーション先のモデルを取得
+  const relatedModel = dmmf.datamodel.models.find(m => m.name === field.type);
+  
+  if (!relatedModel) {
+    return 'null';
+  }
+  
+  // 循環参照を避けるため、リレーションフィールドは null または空配列にする
+  if (field.isList) {
+    return '[]';
+  }
+  
+  // 必須フィールドでない場合は null
+  if (!field.isRequired) {
+    return 'null';
+  }
+  
+  // 必須フィールドの場合は、リレーション先のIDフィールドのみを含むオブジェクトを返す
+  const idField = relatedModel.fields.find(f => f.isId);
+  if (idField) {
+    const idValue = generateFieldMockValue(idField, config);
+    return `{ ${idField.name}: ${idValue} }`;
+  }
+  
+  return 'null';
+}
+
+function generateEnumMockValue(field: DMMF.Field, config: GeneratorConfig, dmmf: DMMF.Document): string {
+  // Enum定義を探す
+  const enumDef = dmmf.datamodel.enums.find(e => e.name === field.type);
+  
+  if (!enumDef || enumDef.values.length === 0) {
+    return 'null';
+  }
+  
+  // ランダムに値を選択
+  const randomIndex = `Math.floor(Math.random() * ${enumDef.values.length})`;
+  const enumValues = enumDef.values.map(v => `'${v.name}'`).join(', ');
+  
+  if (field.isList) {
+    // 配列の場合は1〜3個のランダムな値を返す
+    return `[${enumValues}].slice(0, faker.number.int({ min: 1, max: 3 }))`;
+  }
+  
+  // 単一の値の場合
+  const mockValue = `[${enumValues}][${randomIndex}]`;
+  
+  if (!field.isRequired) {
+    return `Math.random() > 0.5 ? ${mockValue} : null`;
+  }
+  
+  return mockValue;
 }
