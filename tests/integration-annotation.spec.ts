@@ -28,7 +28,9 @@ describe('mockFactory with annotations', () => {
     const result = generateMockFactory(model, config, dmmf);
 
     expect(result).toContain('email: faker.internet.email()');
-    expect(result).toContain('age: Math.random() > 0.5 ? faker.number.int({ min: 18, max: 100 }) : null');
+    expect(result).toContain(
+      'age: Math.random() > 0.5 ? faker.number.int({ min: 18, max: 100 }) : null'
+    );
   });
 
   it('should handle string literal annotations', () => {
@@ -77,7 +79,8 @@ describe('mockFactory with annotations', () => {
         createMockDMMFField({
           name: 'bio',
           type: 'String',
-          documentation: 'User biography\n@mock faker.lorem.paragraphs(3)\nThis field stores user bio',
+          documentation:
+            'User biography\n@mock faker.lorem.paragraphs(3)\nThis field stores user bio',
         }),
       ],
     });

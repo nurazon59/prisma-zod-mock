@@ -119,19 +119,19 @@ model User {
   // Fakerのメソッドを直接指定
   email     String   @unique /// @mock faker.internet.email()
   name      String?  /// @mock faker.person.fullName()
-  
+
   // 固定値
   role      String   @default("USER") /// @mock "USER"
   isActive  Boolean  /// @mock true
-  
+
   // 数値の範囲指定
   age       Int?     /// @mock.range(18, 100)
   score     Float    /// @mock.range(0.0, 100.0)
-  
+
   // 正規表現パターン
   code      String   /// @mock.pattern("[A-Z]{3}-[0-9]{4}")
   phone     String?  /// @mock.pattern("[0-9]{3}-[0-9]{4}-[0-9]{4}")
-  
+
   // 選択肢からランダムに選択
   country   String   /// @mock.enum("Japan", "USA", "UK", "France")
   status    String   /// @mock.enum("active", "inactive", "pending")
@@ -148,7 +148,7 @@ model Settings {
   emailNotifications  Boolean  @default(true)   // モック: true
   theme              String   @default("light") // モック: 'light'
   maxRetries         Int      @default(3)       // モック: 3
-  
+
   // @mockアノテーションがある場合はそちらを優先
   language           String   @default("en") /// @mock "ja"  // モック: "ja"
 }

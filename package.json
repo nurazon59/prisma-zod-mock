@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/prisma-zod-mock.git"
+    "url": "https://github.com/itsuki54/prisma-zod-mock.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/prisma-zod-mock/issues"
+    "url": "https://github.com/itsuki54/prisma-zod-mock/issues"
   },
-  "homepage": "https://github.com/yourusername/prisma-zod-mock#readme",
+  "homepage": "https://github.com/itsuki54/prisma-zod-mock#readme",
   "description": "Generate Zod schemas and mock factories from Prisma schema",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",

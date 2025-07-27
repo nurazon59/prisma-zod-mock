@@ -147,7 +147,6 @@ describe('parseZodMockAnnotation', () => {
     });
   });
 
-
   it('should return null when no documentation', () => {
     const field = createMockDMMFField({
       documentation: undefined,
