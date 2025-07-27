@@ -1,39 +1,39 @@
 # Prisma Zod Mock
 
-PrismaスキーマからZodバリデーションスキーマとモックデータファクトリーを自動生成する統合ライブラリです。
+An integrated library that automatically generates Zod validation schemas and mock data factories from Prisma schemas.
 
-## 特徴
+## Features
 
-- 🚀 Prismaスキーマから自動的にZodスキーマを生成
-- 🎯 型安全なモックデータファクトリーの自動生成
-- 🧠 フィールド名からのセマンティック推論による現実的なデータ生成
-- 🔗 リレーションを考慮した一貫性のあるデータ生成
-- ⚡ zod-prisma-types互換のオプション
+- 🚀 Automatically generate Zod schemas from Prisma schemas
+- 🎯 Type-safe mock data factory generation
+- 🧠 Realistic data generation through semantic inference from field names
+- 🔗 Consistent data generation considering relations
+- ⚡ zod-prisma-types compatible options
 
-## インストール
+## Installation
 
 ```bash
 npm install --save-dev prisma-zod-mock
-# または
+# or
 yarn add -D prisma-zod-mock
-# または
+# or
 pnpm add -D prisma-zod-mock
 ```
 
-## 使用方法
+## Usage
 
-### 1. Prismaスキーマに設定を追加
+### 1. Add Configuration to Prisma Schema
 
 ```prisma
 generator zodMock {
   provider                = "prisma-zod-mock"
   output                 = "./generated"
 
-  // オプション設定
+  // Optional settings
   createZodSchemas       = true
   createMockFactories    = true
   useMultipleFiles       = false
-  mockDataLocale        = "ja"
+  mockDataLocale        = "en"
 }
 
 model User {
@@ -54,18 +54,18 @@ model Post {
 }
 ```
 
-### 2. 生成の実行
+### 2. Run Generation
 
 ```bash
 npx prisma generate
 ```
 
-### 3. 生成されたコードの使用
+### 3. Use Generated Code
 
 ```typescript
 import { createUserMock, UserSchema } from './generated';
 
-// 単一のモックデータ生成
+// Generate single mock data
 const user = createUserMock();
 console.log(user);
 // {
@@ -75,118 +75,118 @@ console.log(user);
 //   createdAt: 2024-01-01T00:00:00.000Z
 // }
 
-// カスタマイズしたモックデータ
+// Customized mock data
 const customUser = createUserMock({
   name: 'Alice Smith',
   email: 'alice@example.com',
 });
 
-// Zodスキーマでのバリデーション
+// Validation with Zod schema
 const validatedUser = UserSchema.parse(customUser);
 
-// バッチ生成
+// Batch generation
 const users = createUserMockBatch(10);
 ```
 
-## 設定オプション
+## Configuration Options
 
-| オプション            | デフォルト | 説明                                   |
-| --------------------- | ---------- | -------------------------------------- |
-| `createZodSchemas`    | `true`     | Zodスキーマを生成するか                |
-| `createMockFactories` | `true`     | モックファクトリーを生成するか         |
-| `useMultipleFiles`    | `false`    | 複数ファイルに分割して出力するか       |
-| `writeBarrelFiles`    | `true`     | バレルファイル（index.ts）を生成するか |
-| `mockDataLocale`      | `"en"`     | Faker.jsのロケール設定                 |
-| `mockDateRange`       | `30`       | 日付生成の範囲（日数）                 |
-| `createRelationMocks` | `true`     | リレーション付きモックを生成するか     |
+| Option                | Default | Description                                    |
+| --------------------- | ------- | ---------------------------------------------- |
+| `createZodSchemas`    | `true`  | Whether to generate Zod schemas                |
+| `createMockFactories` | `true`  | Whether to generate mock factories             |
+| `useMultipleFiles`    | `false` | Whether to split output into multiple files    |
+| `writeBarrelFiles`    | `true`  | Whether to generate barrel files (index.ts)    |
+| `mockDataLocale`      | `"en"`  | Faker.js locale setting                        |
+| `mockDateRange`       | `30`    | Date generation range (in days)                |
+| `createRelationMocks` | `true`  | Whether to generate mocks with relations       |
 
-## フィールドレベルアノテーション
+## Field-Level Annotations
 
-`@mock`アノテーションを使用して、各フィールドのモック生成ロジックをカスタマイズできます。
+You can customize mock generation logic for each field using `@mock` annotations.
 
-### 値生成の優先順位
+### Value Generation Priority
 
-prisma-zod-mockは以下の優先順位で値を生成します：
+prisma-zod-mock generates values based on the following priority:
 
-1. **@mockアノテーション** - 最優先
-2. **Prismaデフォルト値** - `@default("USER")`や`@default(true)`など
-3. **セマンティック推論** - フィールド名から自動判定
+1. **@mock annotation** - Highest priority
+2. **Prisma default values** - `@default("USER")`, `@default(true)`, etc.
+3. **Semantic inference** - Automatically determined from field names
 
-### 基本的な使い方
+### Basic Usage
 
 ```prisma
 model User {
-  // Fakerのメソッドを直接指定
+  // Direct Faker method specification
   email     String   @unique /// @mock faker.internet.email()
   name      String?  /// @mock faker.person.fullName()
 
-  // 固定値
+  // Fixed values
   role      String   @default("USER") /// @mock "USER"
   isActive  Boolean  /// @mock true
 
-  // 数値の範囲指定
+  // Numeric range specification
   age       Int?     /// @mock.range(18, 100)
   score     Float    /// @mock.range(0.0, 100.0)
 
-  // 正規表現パターン
+  // Regular expression pattern
   code      String   /// @mock.pattern("[A-Z]{3}-[0-9]{4}")
   phone     String?  /// @mock.pattern("[0-9]{3}-[0-9]{4}-[0-9]{4}")
 
-  // 選択肢からランダムに選択
+  // Random selection from choices
   country   String   /// @mock.enum("Japan", "USA", "UK", "France")
   status    String   /// @mock.enum("active", "inactive", "pending")
 }
 ```
 
-### デフォルト値の活用
+### Using Default Values
 
-Prismaの`@default`属性が設定されている場合、モックでも同じ値を使用します：
+When Prisma's `@default` attribute is set, the mock uses the same value:
 
 ```prisma
 model Settings {
-  // @defaultの値がモックでも使用される
-  emailNotifications  Boolean  @default(true)   // モック: true
-  theme              String   @default("light") // モック: 'light'
-  maxRetries         Int      @default(3)       // モック: 3
+  // @default values are used in mocks
+  emailNotifications  Boolean  @default(true)   // Mock: true
+  theme              String   @default("light") // Mock: 'light'
+  maxRetries         Int      @default(3)       // Mock: 3
 
-  // @mockアノテーションがある場合はそちらを優先
-  language           String   @default("en") /// @mock "ja"  // モック: "ja"
+  // @mock annotation takes precedence when present
+  language           String   @default("en") /// @mock "ja"  // Mock: "ja"
 }
 ```
 
-## セマンティック推論
+## Semantic Inference
 
-フィールド名から自動的にデータタイプを推測します：
+Automatically infers data types from field names:
 
-- `email`, `mail` → メールアドレス
-- `name`, `firstName`, `lastName` → 人名
-- `phone`, `tel`, `mobile` → 電話番号
-- `address`, `street`, `city`, `zip` → 住所
-- `url`, `website`, `link` → URL
-- `description`, `bio`, `about` → 説明文
-- `title`, `heading`, `subject` → タイトル
-- `date`, `createdAt`, `updatedAt` → 日付
-- `image`, `avatar`, `photo` → 画像URL
-- `price`, `cost`, `amount` → 価格
-- `country` → 国名
-- `company`, `organization` → 会社名
+- `email`, `mail` → Email address
+- `name`, `firstName`, `lastName` → Person names
+- `phone`, `tel`, `mobile` → Phone numbers
+- `address`, `street`, `city`, `zip` → Addresses
+- `url`, `website`, `link` → URLs
+- `description`, `bio`, `about` → Descriptions
+- `title`, `heading`, `subject` → Titles
+- `date`, `createdAt`, `updatedAt` → Dates
+- `image`, `avatar`, `photo` → Image URLs
+- `price`, `cost`, `amount` → Prices
+- `country` → Country names
+- `company`, `organization` → Company names
 
-## 開発
+## Development
 
 ```bash
-# 依存関係のインストール
+# Install dependencies
 pnpm install
 
-# テストの実行
+# Run tests
 pnpm test
 
-# ビルド
+# Build
 pnpm build
 
-# 開発モード
+# Development mode
 pnpm dev
 ```
 
-## ライセンス
+## License
 
 MIT

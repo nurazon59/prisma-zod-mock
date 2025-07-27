@@ -2,6 +2,7 @@ src/
 tests/
 examples/
 coverage/
+docs/
 .git/
 .gitignore
 .eslintrc.json
