@@ -1,0 +1,92 @@
+# Configuration
+
+Learn about prisma-zod-mock generator configuration options.
+
+## Generator Options
+
+```prisma filename="schema.prisma"
+generator zodMock {
+  provider = "prisma-zod-mock"
+  output   = "./generated"
+
+  // Optional configurations
+  multiple = true        // Generate separate files for each model
+  locale   = "en"       // Faker.js locale
+  imports  = "./types"  // Custom imports
+}
+```
+
+## Multiple File Output
+
+Generate separate files for each model. Recommended for large schemas.
+
+```prisma
+generator zodMock {
+  provider = "prisma-zod-mock"
+  output   = "./generated"
+  multiple = true
+}
+```
+
+Output structure:
+
+```
+generated/
+├── index.ts
+├── User/
+│   ├── schema.ts
+│   └── mock.ts
+├── Post/
+│   ├── schema.ts
+│   └── mock.ts
+└── ...
+```
+
+## Locale Configuration
+
+Set Faker.js locale. Default is 'ja' (Japanese).
+
+```prisma
+generator zodMock {
+  provider = "prisma-zod-mock"
+  output   = "./generated"
+  locale   = "en"  // English
+}
+```
+
+Available locales:
+
+- `en` - English
+- `ja` - Japanese
+- `de` - German
+- `fr` - French
+- And many more from Faker.js
+
+## Custom Imports
+
+Include additional imports in generated files.
+
+```prisma
+generator zodMock {
+  provider = "prisma-zod-mock"
+  output   = "./generated"
+  imports  = "./custom-types"
+}
+```
+
+## Mock Configuration
+
+Configure default behavior of generated mock data.
+
+```prisma
+generator zodMock {
+  provider = "prisma-zod-mock"
+  output   = "./generated"
+
+  // Mock configuration
+  mockConfig = {
+    "defaultOptionalFields": true,  // Include optional fields by default
+    "seed": 123456                 // Seed for reproducible data
+  }
+}
+```

@@ -1,0 +1,163 @@
+# Usage
+
+Learn how to use generated Zod schemas and mock factories.
+
+## Using Zod Schemas
+
+### Validation
+
+```typescript
+import { UserSchema } from './generated';
+
+// Validate data
+const userData = {
+  id: 'clh3k4n5j0000qw8w5h3k4n5j',
+  email: 'user@example.com',
+  name: 'John Doe',
+};
+
+const validatedUser = UserSchema.parse(userData);
+// Throws if validation fails
+
+// Safe parsing
+const result = UserSchema.safeParse(userData);
+if (result.success) {
+  console.log(result.data);
+} else {
+  console.error(result.error);
+}
+```
+
+### Type Inference
+
+```typescript
+import { UserSchema } from './generated';
+import { z } from 'zod';
+
+// Infer types from schema
+type User = z.infer<typeof UserSchema>;
+
+// Use in functions
+function processUser(user: User) {
+  console.log(user.email);
+}
+```
+
+## Using Mock Factories
+
+### Basic Usage
+
+```typescript
+import { createUserMock } from './generated';
+
+// Generate a mock user
+const user = createUserMock();
+console.log(user);
+// {
+//   id: 'clh3k4n5j0000qw8w5h3k4n5j',
+//   email: 'john.doe@example.com',
+//   name: 'John Doe'
+// }
+```
+
+### Specifying Custom Data
+
+```typescript
+import { createUserMock } from './generated';
+
+// Override specific fields
+const customUser = createUserMock({
+  email: 'custom@example.com',
+  name: 'Custom Name',
+});
+
+// ID is still auto-generated
+console.log(customUser);
+// {
+//   id: 'clh3k4n5j0000qw8w5h3k4n5j',
+//   email: 'custom@example.com',
+//   name: 'Custom Name'
+// }
+```
+
+### Mocks with Relations
+
+```typescript
+import { createUserMock, createPostMock } from './generated';
+
+// Create related data
+const user = createUserMock();
+const post = createPostMock({
+  authorId: user.id,
+  author: user,
+});
+
+console.log(post);
+// {
+//   id: 'clh3k4n5j0001qw8w5h3k4n5k',
+//   title: 'Sample Blog Post',
+//   content: 'This is a sample blog post content.',
+//   authorId: 'clh3k4n5j0000qw8w5h3k4n5j',
+//   author: { ... }
+// }
+```
+
+## Best Practices
+
+### Usage in Tests
+
+```typescript
+// jest.test.ts
+import { createUserMock } from './generated';
+
+describe('User Service', () => {
+  it('should create a user', async () => {
+    const mockUser = createUserMock();
+
+    const result = await userService.create(mockUser);
+
+    expect(result).toEqual(
+      expect.objectContaining({
+        email: mockUser.email,
+        name: mockUser.name,
+      })
+    );
+  });
+});
+```
+
+### Database Seeding
+
+```typescript
+// seed.ts
+import { PrismaClient } from '@prisma/client';
+import { createUserMock, createPostMock } from './generated';
+
+const prisma = new PrismaClient();
+
+async function seed() {
+  // Create 10 users
+  const users = await Promise.all(
+    Array.from({ length: 10 }).map(() =>
+      prisma.user.create({
+        data: createUserMock(),
+      })
+    )
+  );
+
+  // Create 3 posts for each user
+  for (const user of users) {
+    await Promise.all(
+      Array.from({ length: 3 }).map(() =>
+        prisma.post.create({
+          data: createPostMock({ authorId: user.id }),
+        })
+      )
+    );
+  }
+}
+
+seed()
+  .catch(console.error)
+  .finally(() => prisma.$disconnect());
+```

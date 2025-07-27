@@ -61,12 +61,12 @@ model Tag {
 
 ```typescript filename="tests/blog.test.ts"
 import { describe, it, expect } from 'vitest';
-import { 
-  createUserMock, 
-  createPostMock, 
+import {
+  createUserMock,
+  createPostMock,
   createPostMockBatch,
   UserSchema,
-  PostSchema 
+  PostSchema,
 } from './generated/mocks';
 
 describe('ブログ機能のテスト', () => {
@@ -74,23 +74,23 @@ describe('ブログ機能のテスト', () => {
     const user = createUserMock({ role: 'USER' });
     const post = createPostMock({
       authorId: user.id,
-      published: false
+      published: false,
     });
-    
+
     expect(post.authorId).toBe(user.id);
     expect(post.published).toBe(false);
     expect(PostSchema.parse(post)).toEqual(post);
   });
-  
+
   it('管理者は複数の投稿を管理できる', () => {
     const admin = createUserMock({ role: 'ADMIN' });
     const posts = createPostMockBatch(10, {
       authorId: admin.id,
-      published: true
+      published: true,
     });
-    
+
     expect(posts).toHaveLength(10);
-    posts.forEach(post => {
+    posts.forEach((post) => {
       expect(post.authorId).toBe(admin.id);
       expect(post.published).toBe(true);
     });
@@ -159,10 +159,10 @@ model Order {
 ### テストでの活用例
 
 ```typescript filename="ecommerce/tests/order.test.ts"
-import { 
+import {
   createCustomerWithRelationsMock,
   createProductMockBatch,
-  createOrderMock 
+  createOrderMock,
 } from '../src/test-utils/mocks';
 
 describe('注文処理', () => {
@@ -174,21 +174,21 @@ describe('注文処理', () => {
         {
           type: 'SHIPPING',
           prefecture: '東京都',
-          city: '渋谷区'
-        }
-      ]
+          city: '渋谷区',
+        },
+      ],
     });
-    
+
     // 商品を生成
     const products = createProductMockBatch(3);
-    
+
     // 注文を作成
     const order = createOrderMock({
       customerId: customer.id,
       addressId: customer.addresses[0].id,
-      totalAmount: products.reduce((sum, p) => sum + p.price, 0)
+      totalAmount: products.reduce((sum, p) => sum + p.price, 0),
     });
-    
+
     expect(order.customerId).toBe(customer.id);
     expect(order.status).toBe('PENDING');
   });
@@ -198,45 +198,45 @@ describe('注文処理', () => {
 ## SaaSアプリケーションの例
 
 ```typescript filename="saas/mock-factories.ts"
-import { 
+import {
   createOrganizationMock,
   createUserMock,
   createProjectMock,
-  createSubscriptionMock 
+  createSubscriptionMock,
 } from './generated';
 
 // 組織のセットアップ
 export function setupOrganization() {
   const org = createOrganizationMock({
-    plan: 'ENTERPRISE'
+    plan: 'ENTERPRISE',
   });
-  
+
   const owner = createUserMock({
     organizationId: org.id,
-    role: 'OWNER'
+    role: 'OWNER',
   });
-  
+
   const members = createUserMockBatch(5, {
     organizationId: org.id,
-    role: 'MEMBER'
+    role: 'MEMBER',
   });
-  
+
   const projects = createProjectMockBatch(3, {
-    organizationId: org.id
+    organizationId: org.id,
   });
-  
+
   const subscription = createSubscriptionMock({
     organizationId: org.id,
     plan: 'ENTERPRISE',
-    status: 'ACTIVE'
+    status: 'ACTIVE',
   });
-  
+
   return {
     organization: org,
     owner,
     members,
     projects,
-    subscription
+    subscription,
   };
 }
 
@@ -244,7 +244,7 @@ export function setupOrganization() {
 describe('組織管理', () => {
   it('エンタープライズ組織の初期セットアップ', () => {
     const { organization, owner, members, projects } = setupOrganization();
-    
+
     expect(organization.plan).toBe('ENTERPRISE');
     expect(owner.role).toBe('OWNER');
     expect(members).toHaveLength(5);
@@ -258,11 +258,7 @@ describe('組織管理', () => {
 ```typescript filename="mock-server/handlers.ts"
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
-import { 
-  createUserMock,
-  createPostMockBatch,
-  createCommentMockBatch 
-} from './generated';
+import { createUserMock, createPostMockBatch, createCommentMockBatch } from './generated';
 
 const handlers = [
   // ユーザー取得
@@ -271,37 +267,39 @@ const handlers = [
     const user = createUserMock({ id: id as string });
     return res(ctx.json(user));
   }),
-  
+
   // 投稿一覧
   rest.get('/api/posts', (req, res, ctx) => {
     const page = Number(req.url.searchParams.get('page') || 1);
     const limit = Number(req.url.searchParams.get('limit') || 10);
-    
+
     const posts = createPostMockBatch(limit, {
-      published: true
+      published: true,
     });
-    
-    return res(ctx.json({
-      data: posts,
-      page,
-      limit,
-      total: 100
-    }));
+
+    return res(
+      ctx.json({
+        data: posts,
+        page,
+        limit,
+        total: 100,
+      })
+    );
   }),
-  
+
   // コメント追加
   rest.post('/api/posts/:postId/comments', async (req, res, ctx) => {
     const { postId } = req.params;
     const body = await req.json();
-    
+
     const comment = createCommentMock({
       postId: postId as string,
       content: body.content,
-      authorId: body.authorId
+      authorId: body.authorId,
     });
-    
+
     return res(ctx.status(201), ctx.json(comment));
-  })
+  }),
 ];
 
 export const server = setupServer(...handlers);

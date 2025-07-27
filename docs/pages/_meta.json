@@ -3,10 +3,22 @@
     "title": "ホーム",
     "type": "page"
   },
+  "-- Getting Started": {
+    "type": "separator",
+    "title": "はじめに"
+  },
   "installation": "インストール",
   "configuration": "設定",
+  "-- Guide": {
+    "type": "separator",
+    "title": "ガイド"
+  },
   "usage": "使い方",
   "annotations": "アノテーション",
+  "-- More": {
+    "type": "separator",
+    "title": "その他"
+  },
   "examples": "サンプル",
   "faq": "よくある質問"
 }

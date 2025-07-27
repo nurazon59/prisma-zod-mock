@@ -106,20 +106,18 @@ import { createUser } from './user-service';
 describe('User Service', () => {
   it('should create a valid user', async () => {
     const mockUser = createUserMock();
-    
+
     const result = await createUser(mockUser);
-    
+
     expect(result).toBeDefined();
     expect(UserSchema.parse(result)).toEqual(result);
   });
-  
+
   it('should handle batch operations', async () => {
     const mockUsers = createUserMockBatch(10);
-    
-    const results = await Promise.all(
-      mockUsers.map(user => createUser(user))
-    );
-    
+
+    const results = await Promise.all(mockUsers.map((user) => createUser(user)));
+
     expect(results).toHaveLength(10);
   });
 });
@@ -166,17 +164,11 @@ import { createUserMock, createPostMockBatch } from './generated';
 
 export const handlers = [
   rest.get('/api/users/:id', (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json(createUserMock({ id: req.params.id }))
-    );
+    return res(ctx.status(200), ctx.json(createUserMock({ id: req.params.id })));
   }),
-  
+
   rest.get('/api/posts', (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json(createPostMockBatch(20))
-    );
+    return res(ctx.status(200), ctx.json(createPostMockBatch(20)));
   }),
 ];
 ```

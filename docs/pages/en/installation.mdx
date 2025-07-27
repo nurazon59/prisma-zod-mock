@@ -1,0 +1,61 @@
+# Installation
+
+Learn how to install prisma-zod-mock.
+
+## Requirements
+
+- Node.js 16.0.0 or higher
+- Prisma 4.0.0 or higher
+
+## Installation with Package Managers
+
+import { Tabs, Tab } from 'nextra/components';
+
+<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
+  <Tab>```bash npm install --save-dev prisma-zod-mock ```</Tab>
+  <Tab>```bash pnpm add -D prisma-zod-mock ```</Tab>
+  <Tab>```bash yarn add -D prisma-zod-mock ```</Tab>
+  <Tab>```bash bun add -d prisma-zod-mock ```</Tab>
+</Tabs>
+
+## Prisma Schema Setup
+
+Add the generator to your `schema.prisma` file:
+
+```prisma filename="schema.prisma"
+generator zodMock {
+  provider = "prisma-zod-mock"
+  output   = "./generated"
+}
+
+// Your models
+model User {
+  id    String @id @default(cuid())
+  email String @unique
+  name  String?
+}
+```
+
+## Generate Command
+
+Run the following command to generate Zod schemas and mock factories:
+
+```bash
+npx prisma generate
+```
+
+## Output File Structure
+
+Structure of generated files:
+
+```
+generated/
+├── index.ts       // Main export file
+├── schemas.ts     // Zod schemas
+└── mocks.ts       // Mock factories
+```
+
+## Next Steps
+
+- [Configuration](/en/configuration) - Learn about generator configuration options
+- [Usage](/en/usage) - Check how to use the generated code

@@ -3,70 +3,75 @@ import { Tabs, Tab, Cards, Card, Steps } from 'nextra/components';
 # Prisma Zod Mock
 
 <p className="text-xl text-gray-600 dark:text-gray-400">
-  PrismaスキーマからZodバリデーションスキーマとモックデータファクトリーを自動生成する統合ライブラリ
+  An integrated library that automatically generates Zod validation schemas and mock data factories
+  from Prisma schemas
 </p>
 
-## はじめに
+## Getting Started
 
 <Cards>
-  <Card title="📚 ドキュメント" href="/installation">
-    インストールから基本的な使い方まで
+  <Card title="📚 Documentation" href="/en/installation">
+    From installation to basic usage
   </Card>
-  <Card title="🚀 クイックスタート" href="#クイックスタート">
-    5分で始める prisma-zod-mock
+  <Card title="🚀 Quick Start" href="#quick-start">
+    Get started with prisma-zod-mock in 5 minutes
   </Card>
-  <Card title="💡 サンプル" href="/examples">
-    実践的な使用例を確認
+  <Card title="💡 Examples" href="/en/examples">
+    Check out practical use cases
   </Card>
-  <Card title="❓ FAQ" href="/faq">
-    よくある質問と回答
+  <Card title="❓ FAQ" href="/en/faq">
+    Frequently asked questions
   </Card>
 </Cards>
 
-## 特徴
+## Features
 
 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
   <div className="flex gap-4">
     <div className="text-4xl">🚀</div>
     <div>
-      <h3 className="font-bold text-lg mb-2">自動生成</h3>
+      <h3 className="font-bold text-lg mb-2">Auto Generation</h3>
       <p className="text-gray-600 dark:text-gray-400">
-        Prismaスキーマから自動的にZodスキーマを生成します
+        Automatically generates Zod schemas from Prisma schemas
       </p>
     </div>
   </div>
   <div className="flex gap-4">
     <div className="text-4xl">🎯</div>
     <div>
-      <h3 className="font-bold text-lg mb-2">型安全</h3>
-      <p className="text-gray-600 dark:text-gray-400">型安全なモックデータファクトリーの自動生成</p>
+      <h3 className="font-bold text-lg mb-2">Type Safe</h3>
+      <p className="text-gray-600 dark:text-gray-400">
+        Auto-generates type-safe mock data factories
+      </p>
     </div>
   </div>
   <div className="flex gap-4">
     <div className="text-4xl">🧠</div>
     <div>
-      <h3 className="font-bold text-lg mb-2">セマンティック推論</h3>
-      <p className="text-gray-600 dark:text-gray-400">フィールド名から現実的なデータを自動生成</p>
+      <h3 className="font-bold text-lg mb-2">Semantic Inference</h3>
+      <p className="text-gray-600 dark:text-gray-400">
+        Automatically generates realistic data from field names
+      </p>
     </div>
   </div>
   <div className="flex gap-4">
     <div className="text-4xl">🔗</div>
     <div>
-      <h3 className="font-bold text-lg mb-2">リレーション対応</h3>
+      <h3 className="font-bold text-lg mb-2">Relations Support</h3>
       <p className="text-gray-600 dark:text-gray-400">
-        リレーションを考慮した一貫性のあるデータ生成
+        Generates consistent data considering relations
       </p>
     </div>
   </div>
 </div>
 
-## クイックスタート
+## Quick Start
 
 <Steps>
 
-### インストール
+### Installation
 
-お好みのパッケージマネージャーでインストールします：
+Install with your favorite package manager:
 
 <Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
   <Tab>```bash npm install --save-dev prisma-zod-mock ```</Tab>
@@ -75,9 +80,9 @@ import { Tabs, Tab, Cards, Card, Steps } from 'nextra/components';
   <Tab>```bash bun add -d prisma-zod-mock ```</Tab>
 </Tabs>
 
-### Prismaスキーマの設定
+### Prisma Schema Setup
 
-`schema.prisma`にジェネレーターを追加します：
+Add the generator to your `schema.prisma`:
 
 ```prisma filename="schema.prisma" {3-6}
 datasource db {
@@ -98,17 +103,17 @@ model User {
 }
 ```
 
-### コード生成
+### Generate Code
 
-Prismaのジェネレーターを実行します：
+Run the Prisma generator:
 
 ```bash
 npx prisma generate
 ```
 
-### 使用方法
+### Usage
 
-生成されたコードを使ってモックデータを作成します：
+Create mock data using the generated code:
 
 ```typescript filename="app.ts"
 import { createUserMock } from './generated';
@@ -125,11 +130,11 @@ console.log(user);
 
 </Steps>
 
-## ユースケース
+## Use Cases
 
-### 🧪 テスト
+### 🧪 Testing
 
-単体テストや統合テストで一貫性のあるモックデータを生成
+Generate consistent mock data for unit and integration tests
 
 ```typescript
 describe('UserService', () => {
@@ -141,9 +146,9 @@ describe('UserService', () => {
 });
 ```
 
-### 🌱 シーディング
+### 🌱 Seeding
 
-開発環境やテスト環境のデータベースに現実的なデータを投入
+Populate development and test databases with realistic data
 
 ```typescript
 async function seed() {
@@ -152,25 +157,25 @@ async function seed() {
 }
 ```
 
-### 📝 型検証
+### 📝 Type Validation
 
-APIのリクエスト/レスポンスの型検証
+Validate API request/response types
 
 ```typescript
 const userInput = req.body;
 const validatedUser = UserSchema.parse(userInput);
 ```
 
-## コミュニティ
+## Community
 
 <Cards>
   <Card title="GitHub" href="https://github.com/h-takeyeah/prisma-zod-mock">
-    ソースコードとイシューの管理
+    Source code and issue tracking
   </Card>
   <Card title="Discord" href="#">
-    コミュニティでの質問と議論
+    Community questions and discussions
   </Card>
   <Card title="Twitter" href="#">
-    最新情報とアップデート
+    Latest news and updates
   </Card>
 </Cards>

@@ -8,7 +8,7 @@
 generator zodMock {
   provider                = "prisma-zod-mock"
   output                 = "./generated"
-  
+
   // オプション設定
   createZodSchemas       = true
   createMockFactories    = true
@@ -24,26 +24,26 @@ generator zodMock {
 
 ### 基本設定
 
-| オプション | デフォルト | 説明 |
-|----------|---------|-----|
-| `output` | `"./generated"` | 生成されたファイルの出力先ディレクトリ |
-| `createZodSchemas` | `true` | Zodスキーマを生成するかどうか |
-| `createMockFactories` | `true` | モックファクトリー関数を生成するかどうか |
+| オプション            | デフォルト      | 説明                                     |
+| --------------------- | --------------- | ---------------------------------------- |
+| `output`              | `"./generated"` | 生成されたファイルの出力先ディレクトリ   |
+| `createZodSchemas`    | `true`          | Zodスキーマを生成するかどうか            |
+| `createMockFactories` | `true`          | モックファクトリー関数を生成するかどうか |
 
 ### ファイル管理
 
-| オプション | デフォルト | 説明 |
-|----------|---------|-----|
-| `useMultipleFiles` | `false` | モデルごとに個別のファイルを生成するかどうか |
-| `writeBarrelFiles` | `true` | バレルファイル（index.ts）を生成するかどうか |
+| オプション         | デフォルト | 説明                                         |
+| ------------------ | ---------- | -------------------------------------------- |
+| `useMultipleFiles` | `false`    | モデルごとに個別のファイルを生成するかどうか |
+| `writeBarrelFiles` | `true`     | バレルファイル（index.ts）を生成するかどうか |
 
 ### モックデータ設定
 
-| オプション | デフォルト | 説明 |
-|----------|---------|-----|
-| `mockDataLocale` | `"en"` | Faker.jsのロケール設定（例: `"ja"`, `"en"`, `"fr"`） |
-| `mockDateRange` | `30` | 日付生成時の前後の日数範囲 |
-| `createRelationMocks` | `true` | リレーションを含むモックファクトリーを生成するかどうか |
+| オプション            | デフォルト | 説明                                                   |
+| --------------------- | ---------- | ------------------------------------------------------ |
+| `mockDataLocale`      | `"en"`     | Faker.jsのロケール設定（例: `"ja"`, `"en"`, `"fr"`）   |
+| `mockDateRange`       | `30`       | 日付生成時の前後の日数範囲                             |
+| `createRelationMocks` | `true`     | リレーションを含むモックファクトリーを生成するかどうか |
 
 ## 設定例
 

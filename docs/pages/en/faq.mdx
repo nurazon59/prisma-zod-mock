@@ -1,0 +1,217 @@
+# Frequently Asked Questions
+
+Common questions and answers about prisma-zod-mock.
+
+## General Questions
+
+### Are relations supported?
+
+Yes, prisma-zod-mock supports one-to-one, one-to-many, and many-to-many relations.
+
+```prisma
+model User {
+  id      String   @id
+  posts   Post[]   // One-to-many
+  profile Profile? // One-to-one
+  roles   Role[]   // Many-to-many
+}
+```
+
+The generated mock factories will handle these relations appropriately:
+
+```typescript
+const user = createUserMock({
+  posts: [createPostMock(), createPostMock()],
+  profile: createProfileMock(),
+  roles: [createRoleMock()],
+});
+```
+
+### Can I add custom generators?
+
+You can specify custom data generation logic at the field level using annotations.
+
+```prisma
+model User {
+  /// @mock faker.helpers.arrayElement(['active', 'inactive'])
+  status String
+
+  /// @mock customEmail()
+  email  String
+}
+```
+
+For more complex scenarios, you can wrap the generated mocks:
+
+```typescript
+import { createUserMock as baseCreateUserMock } from './generated';
+
+export function createUserMock(overrides?: Partial<User>) {
+  const base = baseCreateUserMock(overrides);
+  return {
+    ...base,
+    // Custom logic here
+    username: base.email.split('@')[0],
+  };
+}
+```
+
+### How is performance with large schemas?
+
+Using the multiple file output option allows efficient operation even with large schemas.
+
+```prisma
+generator zodMock {
+  provider = "prisma-zod-mock"
+  output   = "./generated"
+  multiple = true  // Generates separate files per model
+}
+```
+
+This prevents memory issues and improves build times for projects with many models.
+
+### Is TypeScript required?
+
+Yes, prisma-zod-mock is designed for TypeScript projects. The generated code uses TypeScript types for full type safety.
+
+## Technical Questions
+
+### How do I handle circular references?
+
+Circular references are automatically handled by the generator. When creating mocks with circular relations, pass the related data explicitly:
+
+```typescript
+const user = createUserMock();
+const post = createPostMock({
+  authorId: user.id,
+  author: user, // Explicit relation
+});
+```
+
+### Can I use custom Prisma types?
+
+Yes, custom Prisma types are supported through annotations:
+
+```prisma
+model Product {
+  /// @mock faker.datatype.json()
+  metadata Json
+
+  /// @mock faker.number.float({ min: 0, max: 100, fractionDigits: 2 })
+  price    Decimal
+}
+```
+
+### How do I test with actual database?
+
+For integration tests, use the generated mocks with your Prisma client:
+
+```typescript
+const userData = createUserMock();
+const user = await prisma.user.create({ data: userData });
+
+// Validate with Zod schema
+const validated = UserSchema.parse(user);
+```
+
+### What about database constraints?
+
+The mocks respect Prisma schema constraints:
+
+- `@unique` fields generate unique values
+- `@default` values are applied
+- Required fields are always populated
+- Optional fields can be controlled
+
+## Troubleshooting
+
+### Mock data doesn't match my expectations
+
+Check if you're using semantic inference. Field names affect generated data:
+
+```prisma
+model User {
+  email    String  // Generates email addresses
+  phone    String  // Generates phone numbers
+  imageUrl String  // Generates image URLs
+}
+```
+
+Use annotations for explicit control:
+
+```prisma
+model User {
+  /// @mock faker.internet.email()
+  contactEmail String
+}
+```
+
+### Generated files are too large
+
+Enable multiple file output:
+
+```prisma
+generator zodMock {
+  provider = "prisma-zod-mock"
+  output   = "./generated"
+  multiple = true
+}
+```
+
+### Locale not working correctly
+
+Ensure you're setting the correct locale:
+
+```prisma
+generator zodMock {
+  provider = "prisma-zod-mock"
+  output   = "./generated"
+  locale   = "en"  // or "ja", "de", etc.
+}
+```
+
+### Build errors after generation
+
+Common solutions:
+
+1. Ensure all dependencies are installed:
+
+   ```bash
+   npm install zod @faker-js/faker
+   ```
+
+2. Check TypeScript configuration:
+
+   ```json
+   {
+     "compilerOptions": {
+       "strict": true,
+       "esModuleInterop": true
+     }
+   }
+   ```
+
+3. Regenerate after schema changes:
+   ```bash
+   npx prisma generate
+   ```
+
+## Best Practices
+
+### Testing Strategy
+
+1. **Unit Tests**: Use mocks for isolated testing
+2. **Integration Tests**: Use mocks with test database
+3. **E2E Tests**: Seed database with realistic data
+
+### Performance Optimization
+
+1. Use `multiple` option for large schemas
+2. Create reusable factory functions
+3. Memoize frequently used mocks
+
+### Maintainability
+
+1. Keep annotations close to field definitions
+2. Document custom mock behavior
+3. Version control generated files for stability

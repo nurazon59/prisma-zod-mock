@@ -83,6 +83,7 @@ const users = createUserMockBatch(100);
 ### Q: 生成されたファイルが見つからない
 
 A: 以下を確認してください：
+
 1. `npx prisma generate`を実行したか
 2. `output`パスが正しいか
 3. `.gitignore`でファイルが除外されていないか
@@ -90,6 +91,7 @@ A: 以下を確認してください：
 ### Q: モックデータが期待と異なる
 
 A: 値生成の優先順位を確認してください：
+
 1. `@mock`アノテーション（最優先）
 2. `@default`値
 3. セマンティック推論
@@ -97,6 +99,7 @@ A: 値生成の優先順位を確認してください：
 ### Q: エラー「Cannot find module」が発生する
 
 A: 以下を試してください：
+
 ```bash
 # node_modulesを削除して再インストール
 rm -rf node_modules
@@ -111,6 +114,7 @@ npx prisma generate
 ### Q: 生成が遅い場合は？
 
 A: 大規模なスキーマの場合、以下を検討してください：
+
 - `useMultipleFiles`を`true`にして並列処理を活用
 - 不要なモデルは`@@ignore`で除外
 - 必要最小限のリレーションのみ定義
@@ -156,7 +160,7 @@ import { faker } from '@faker-js/faker';
 import { createUserMock } from './generated';
 
 const user = createUserMock({
-  bio: faker.lorem.paragraphs(5)
+  bio: faker.lorem.paragraphs(5),
 });
 ```
 
