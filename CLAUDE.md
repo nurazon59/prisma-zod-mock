@@ -59,8 +59,6 @@ pnpm typecheck
   - `generators/`: 各種データ型の値生成器
   - `semantics/`: フィールド名からの意味推論
 
-- `src/runtime/`: ランタイムで使用される型とユーティリティ
-
 - `src/templates/`: 生成されるコードのテンプレート
   - `mockFactory.ts`: モックファクトリーのテンプレート
   - `zodSchema.ts`: Zodスキーマのテンプレート

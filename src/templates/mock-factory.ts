@@ -1,7 +1,10 @@
 import { DMMF } from '@prisma/generator-helper';
 import { GeneratorConfig } from '../generator/config/types';
 import { analyzeFieldName } from '../mock/semantics/field-name-analyzer';
-import { parseZodMockAnnotation, generateMockExpression } from '../generator/utils/parse-annotations';
+import {
+  parseZodMockAnnotation,
+  generateMockExpression,
+} from '../generator/utils/parse-annotations';
 
 export function generateMockFactory(
   model: DMMF.Model,
@@ -79,7 +82,7 @@ function generateFieldMockValue(field: DMMF.Field, config: GeneratorConfig): str
 
   const analysis = analyzeFieldName(field.name);
 
-  const mockValue = getMockValueCode(analysis.inferredType || field.type, field.type, field.name, config);
+  const mockValue = getMockValueCode(analysis.inferredType, field.type, field.name, config);
 
   if (!field.isRequired) {
     return `Math.random() > 0.5 ? ${mockValue} : null`;
@@ -89,11 +92,15 @@ function generateFieldMockValue(field: DMMF.Field, config: GeneratorConfig): str
 }
 
 function getMockValueCode(
-  semanticType: string,
+  semanticType: string | undefined,
   fieldType: string,
   fieldName: string,
   config: GeneratorConfig
 ): string {
+  if (!semanticType) {
+    return getDefaultMockValueCode(fieldType, config);
+  }
+
   switch (semanticType) {
     case 'email':
       return 'faker.internet.email()';
