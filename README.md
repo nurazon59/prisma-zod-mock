@@ -90,15 +90,15 @@ const users = createUserMockBatch(10);
 
 ## Configuration Options
 
-| Option                | Default | Description                                    |
-| --------------------- | ------- | ---------------------------------------------- |
-| `createZodSchemas`    | `true`  | Whether to generate Zod schemas                |
-| `createMockFactories` | `true`  | Whether to generate mock factories             |
-| `useMultipleFiles`    | `false` | Whether to split output into multiple files    |
-| `writeBarrelFiles`    | `true`  | Whether to generate barrel files (index.ts)    |
-| `mockDataLocale`      | `"en"`  | Faker.js locale setting                        |
-| `mockDateRange`       | `30`    | Date generation range (in days)                |
-| `createRelationMocks` | `true`  | Whether to generate mocks with relations       |
+| Option                | Default | Description                                 |
+| --------------------- | ------- | ------------------------------------------- |
+| `createZodSchemas`    | `true`  | Whether to generate Zod schemas             |
+| `createMockFactories` | `true`  | Whether to generate mock factories          |
+| `useMultipleFiles`    | `false` | Whether to split output into multiple files |
+| `writeBarrelFiles`    | `true`  | Whether to generate barrel files (index.ts) |
+| `mockDataLocale`      | `"en"`  | Faker.js locale setting                     |
+| `mockDateRange`       | `30`    | Date generation range (in days)             |
+| `createRelationMocks` | `true`  | Whether to generate mocks with relations    |
 
 ## Field-Level Annotations
 
