@@ -23,6 +23,7 @@
     "test:cov": "vitest --coverage",
     "lint": "eslint src --ext .ts",
     "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "pnpm build && pnpm test && pnpm lint"
   },
