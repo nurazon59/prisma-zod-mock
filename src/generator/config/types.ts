@@ -13,6 +13,8 @@ export interface GeneratorConfig {
   mockSeed?: number;
   mockDateRange: number;
   createRelationMocks: boolean;
+  relationMaxDepth: number;
+  modelDepths?: Record<string, number>;
   mockOutputSeparate: boolean;
 }
 
@@ -31,5 +33,6 @@ export const defaultConfig: GeneratorConfig = {
   mockSeed: undefined,
   mockDateRange: 30,
   createRelationMocks: true,
+  relationMaxDepth: 4,
   mockOutputSeparate: false,
 };

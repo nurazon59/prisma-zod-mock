@@ -1,12 +1,13 @@
 import { DMMF } from '@prisma/generator-helper';
 
 export interface ZodMockAnnotation {
-  type: 'custom' | 'faker' | 'fixed' | 'range' | 'pattern' | 'enum';
+  type: 'custom' | 'faker' | 'fixed' | 'range' | 'pattern' | 'enum' | 'relationDepth';
   value?: string;
   min?: number;
   max?: number;
   pattern?: string;
   options?: string[];
+  relationDepth?: number;
 }
 
 export function parseZodMockAnnotation(field: DMMF.Field): ZodMockAnnotation | null {
@@ -46,6 +47,14 @@ export function parseZodMockAnnotation(field: DMMF.Field): ZodMockAnnotation | n
     if (enumMatch) {
       const options = enumMatch[1].split(',').map((opt) => opt.trim().replace(/["']/g, ''));
       return { type: 'enum', options };
+    }
+
+    const relationDepthMatch = trimmed.match(/@mock\.relationDepth\s*\(\s*(\d+)\s*\)/);
+    if (relationDepthMatch) {
+      return {
+        type: 'relationDepth',
+        relationDepth: parseInt(relationDepthMatch[1]),
+      };
     }
   }
 

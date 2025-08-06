@@ -9,16 +9,41 @@ import {
 export function generateMockFactory(
   model: DMMF.Model,
   config: GeneratorConfig,
-  _dmmf: DMMF.Document
+  dmmf: DMMF.Document
 ): string {
   const modelType = config.createZodSchemas ? model.name : `Record<string, unknown>`;
+  const hasRelations = model.fields.some((f) => f.kind === 'object');
 
-  let factory = `export const create${model.name}Mock = (overrides?: Partial<${modelType}>): ${modelType} => {\n`;
+  // モデル別の深度を取得（設定されていなければグローバル設定を使用）
+  const modelMaxDepth = config.modelDepths?.[model.name] ?? config.relationMaxDepth;
+
+  // メイン関数のシグネチャ（リレーションがある場合は深度パラメータを追加）
+  let factory = '';
+  if (config.createRelationMocks && hasRelations) {
+    factory += `export const create${model.name}Mock = (\n`;
+    factory += `  overrides?: Partial<${modelType}>,\n`;
+    factory += `  depth: number = 0,\n`;
+    factory += `  maxDepth: number = ${modelMaxDepth}\n`;
+    factory += `): ${modelType} => {\n`;
+  } else {
+    factory += `export const create${model.name}Mock = (overrides?: Partial<${modelType}>): ${modelType} => {\n`;
+  }
+
   factory += '  return {\n';
 
+  // スカラーフィールドの処理
   for (const field of model.fields) {
     if (field.kind === 'scalar') {
       factory += `    ${field.name}: ${generateFieldMockValue(field, config)},\n`;
+    }
+  }
+
+  // リレーションフィールドの処理
+  if (config.createRelationMocks) {
+    for (const field of model.fields) {
+      if (field.kind === 'object') {
+        factory += generateRelationMockField(field, config, dmmf);
+      }
     }
   }
 
@@ -26,12 +51,24 @@ export function generateMockFactory(
   factory += '  };\n';
   factory += '};\n\n';
 
-  factory += `export const create${model.name}MockBatch = (\n`;
-  factory += `  count: number = 10,\n`;
-  factory += `  overrides?: Partial<${modelType}>\n`;
-  factory += `): ${modelType}[] => {\n`;
-  factory += `  return Array.from({ length: count }, () => create${model.name}Mock(overrides));\n`;
-  factory += '};';
+  // バッチ生成関数
+  if (config.createRelationMocks && hasRelations) {
+    factory += `export const create${model.name}MockBatch = (\n`;
+    factory += `  count: number = 10,\n`;
+    factory += `  overrides?: Partial<${modelType}>,\n`;
+    factory += `  depth: number = 0,\n`;
+    factory += `  maxDepth: number = ${modelMaxDepth}\n`;
+    factory += `): ${modelType}[] => {\n`;
+    factory += `  return Array.from({ length: count }, () => create${model.name}Mock(overrides, depth, maxDepth));\n`;
+    factory += '};';
+  } else {
+    factory += `export const create${model.name}MockBatch = (\n`;
+    factory += `  count: number = 10,\n`;
+    factory += `  overrides?: Partial<${modelType}>\n`;
+    factory += `): ${modelType}[] => {\n`;
+    factory += `  return Array.from({ length: count }, () => create${model.name}Mock(overrides));\n`;
+    factory += '};';
+  }
 
   if (config.createZodSchemas) {
     factory += '\n\n';
@@ -44,9 +81,48 @@ export function generateMockFactory(
   return factory;
 }
 
+function generateRelationMockField(
+  field: DMMF.Field,
+  config: GeneratorConfig,
+  dmmf: DMMF.Document
+): string {
+  // 深度チェックアノテーションのサポート
+  const annotation = parseZodMockAnnotation(field);
+  let customDepth: number | undefined;
+
+  if (annotation && annotation.type === 'relationDepth' && annotation.relationDepth !== undefined) {
+    customDepth = annotation.relationDepth;
+  }
+
+  // リレーションの種類を判定
+  const isList = field.isList;
+  const relatedModel = dmmf.datamodel.models.find((m) => m.name === field.type);
+
+  if (!relatedModel) {
+    return '';
+  }
+
+  // 深度チェックロジック
+  let mockExpression = '';
+  if (isList) {
+    // 1対多 or 多対多
+    const itemCount = field.isRequired ? '{ min: 1, max: 3 }' : '{ min: 0, max: 3 }';
+    mockExpression = `depth < ${customDepth ? `Math.min(maxDepth, ${customDepth})` : 'maxDepth'} ? create${field.type}MockBatch(faker.number.int(${itemCount}), {}, depth + 1, maxDepth) : []`;
+  } else {
+    // 1対1
+    if (field.isRequired) {
+      mockExpression = `depth < ${customDepth ? `Math.min(maxDepth, ${customDepth})` : 'maxDepth'} ? create${field.type}Mock({}, depth + 1, maxDepth) : ({} as ${field.type})`;
+    } else {
+      mockExpression = `depth < ${customDepth ? `Math.min(maxDepth, ${customDepth})` : 'maxDepth'} ? (Math.random() > 0.5 ? create${field.type}Mock({}, depth + 1, maxDepth) : null) : null`;
+    }
+  }
+
+  return `    ${field.name}: ${mockExpression},\n`;
+}
+
 function generateFieldMockValue(field: DMMF.Field, config: GeneratorConfig): string {
   const annotation = parseZodMockAnnotation(field);
-  if (annotation) {
+  if (annotation && annotation.type !== 'relationDepth') {
     const mockValue = generateMockExpression(annotation, field);
     if (!field.isRequired) {
       return `Math.random() > 0.5 ? ${mockValue} : null`;
