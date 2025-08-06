@@ -46,5 +46,23 @@ export function parseConfig(options: GeneratorOptions): GeneratorConfig {
     }
   }
 
+  if (options.generator.config.relationMaxDepth) {
+    const depth = options.generator.config.relationMaxDepth;
+    if (typeof depth === 'string') {
+      config.relationMaxDepth = parseInt(depth, 10);
+    }
+  }
+
+  if (options.generator.config.modelDepths) {
+    const modelDepths = options.generator.config.modelDepths;
+    if (typeof modelDepths === 'string') {
+      try {
+        config.modelDepths = JSON.parse(modelDepths);
+      } catch (e) {
+        console.warn('Failed to parse modelDepths JSON:', modelDepths);
+      }
+    }
+  }
+
   return config;
 }
