@@ -1,6 +1,6 @@
 {
   "name": "prisma-zod-mock",
-  "version": "0.2.0",
+  "version": "0.3.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/itsuki54/prisma-zod-mock.git"
