@@ -4,8 +4,8 @@ import { GeneratorOptions } from '@prisma/generator-helper';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
-describe('Model-specific Depth Tests', () => {
-  it('should apply different depths for different models', async () => {
+describe('モデル別深度テスト', () => {
+  it('異なるモデルに異なる深度を適用する', async () => {
     const outputDir = path.join(__dirname, 'temp-output-model-depths');
 
     const options: GeneratorOptions = {
@@ -229,7 +229,7 @@ describe('Model-specific Depth Tests', () => {
     await fs.rm(outputDir, { recursive: true, force: true });
   });
 
-  it('should fallback to global depth when model is not specified', async () => {
+  it('モデルが指定されていない場合はグローバル深度にフォールバックする', async () => {
     const outputDir = path.join(__dirname, 'temp-output-fallback-depth');
 
     const options: GeneratorOptions = {

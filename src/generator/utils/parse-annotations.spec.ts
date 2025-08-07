@@ -3,8 +3,8 @@ import { parseZodMockAnnotation, generateMockExpression } from './parse-annotati
 import { createMockDMMFField } from '../../../tests/test-helpers';
 
 describe('parseZodMockAnnotation', () => {
-  describe('Faker expressions', () => {
-    it('should parse @mock faker.* expressions', () => {
+  describe('Faker式', () => {
+    it('@mock faker.*式をパースする', () => {
       const field = createMockDMMFField({
         documentation: '@mock faker.internet.email()',
       });
@@ -16,7 +16,7 @@ describe('parseZodMockAnnotation', () => {
       });
     });
 
-    it('should parse complex faker expressions', () => {
+    it('複雑なfaker式をパースする', () => {
       const field = createMockDMMFField({
         documentation: '@mock faker.number.int({ min: 18, max: 100 })',
       });
@@ -29,8 +29,8 @@ describe('parseZodMockAnnotation', () => {
     });
   });
 
-  describe('Fixed values', () => {
-    it('should parse string fixed values', () => {
+  describe('固定値', () => {
+    it('文字列の固定値をパースする', () => {
       const field = createMockDMMFField({
         documentation: '@mock "USER"',
       });
@@ -42,7 +42,7 @@ describe('parseZodMockAnnotation', () => {
       });
     });
 
-    it('should parse numeric fixed values', () => {
+    it('数値の固定値をパースする', () => {
       const field = createMockDMMFField({
         documentation: '@mock 42',
       });
@@ -54,7 +54,7 @@ describe('parseZodMockAnnotation', () => {
       });
     });
 
-    it('should parse boolean fixed values', () => {
+    it('真偽値の固定値をパースする', () => {
       const field = createMockDMMFField({
         documentation: '@mock true',
       });
@@ -67,8 +67,8 @@ describe('parseZodMockAnnotation', () => {
     });
   });
 
-  describe('Range values', () => {
-    it('should parse @mock.range()', () => {
+  describe('範囲値', () => {
+    it('@mock.range()をパースする', () => {
       const field = createMockDMMFField({
         documentation: '@mock.range(18, 100)',
       });
@@ -81,7 +81,7 @@ describe('parseZodMockAnnotation', () => {
       });
     });
 
-    it('should handle spaces in range', () => {
+    it('範囲内のスペースを処理する', () => {
       const field = createMockDMMFField({
         documentation: '@mock.range( 0 , 1000 )',
       });
@@ -95,8 +95,8 @@ describe('parseZodMockAnnotation', () => {
     });
   });
 
-  describe('Pattern values', () => {
-    it('should parse @mock.pattern() with double quotes', () => {
+  describe('パターン値', () => {
+    it('ダブルクォート付き@mock.pattern()をパースする', () => {
       const field = createMockDMMFField({
         documentation: '@mock.pattern("[A-Z]{3}-[0-9]{4}")',
       });
@@ -108,7 +108,7 @@ describe('parseZodMockAnnotation', () => {
       });
     });
 
-    it('should parse @mock.pattern() with single quotes', () => {
+    it('シングルクォート付き@mock.pattern()をパースする', () => {
       const field = createMockDMMFField({
         documentation: "@mock.pattern('[0-9]{3}-[0-9]{4}')",
       });
@@ -121,8 +121,8 @@ describe('parseZodMockAnnotation', () => {
     });
   });
 
-  describe('Enum values', () => {
-    it('should parse @mock.enum()', () => {
+  describe('列挙値', () => {
+    it('@mock.enum()をパースする', () => {
       const field = createMockDMMFField({
         documentation: '@mock.enum("red", "blue", "green")',
       });
@@ -134,7 +134,7 @@ describe('parseZodMockAnnotation', () => {
       });
     });
 
-    it('should handle mixed quotes', () => {
+    it('混合クォートを処理する', () => {
       const field = createMockDMMFField({
         documentation: "@mock.enum('Japan', \"USA\", 'UK')",
       });
@@ -147,7 +147,7 @@ describe('parseZodMockAnnotation', () => {
     });
   });
 
-  it('should return null when no documentation', () => {
+  it('ドキュメントがない場合はnullを返す', () => {
     const field = createMockDMMFField({
       documentation: undefined,
     });
@@ -156,7 +156,7 @@ describe('parseZodMockAnnotation', () => {
     expect(result).toBeNull();
   });
 
-  it('should return null when no annotation', () => {
+  it('アノテーションがない場合はnullを返す', () => {
     const field = createMockDMMFField({
       documentation: 'This is just a regular documentation',
     });
@@ -167,7 +167,7 @@ describe('parseZodMockAnnotation', () => {
 });
 
 describe('generateMockExpression', () => {
-  it('should generate faker expression', () => {
+  it('faker式を生成する', () => {
     const annotation = { type: 'faker' as const, value: 'faker.internet.email()' };
     const field = createMockDMMFField({ type: 'String' });
 
@@ -175,7 +175,7 @@ describe('generateMockExpression', () => {
     expect(result).toBe('faker.internet.email()');
   });
 
-  it('should generate fixed value expression', () => {
+  it('固定値式を生成する', () => {
     const annotation = { type: 'fixed' as const, value: '"USER"' };
     const field = createMockDMMFField({ type: 'String' });
 
@@ -183,7 +183,7 @@ describe('generateMockExpression', () => {
     expect(result).toBe('"USER"');
   });
 
-  it('should generate int range expression', () => {
+  it('整数範囲式を生成する', () => {
     const annotation = { type: 'range' as const, min: 18, max: 100 };
     const field = createMockDMMFField({ type: 'Int' });
 
@@ -191,7 +191,7 @@ describe('generateMockExpression', () => {
     expect(result).toBe('faker.number.int({ min: 18, max: 100 })');
   });
 
-  it('should generate float range expression', () => {
+  it('浮動小数点範囲式を生成する', () => {
     const annotation = { type: 'range' as const, min: 0, max: 100 };
     const field = createMockDMMFField({ type: 'Float' });
 
@@ -199,7 +199,7 @@ describe('generateMockExpression', () => {
     expect(result).toBe('faker.number.float({ min: 0, max: 100 })');
   });
 
-  it('should generate pattern expression', () => {
+  it('パターン式を生成する', () => {
     const annotation = { type: 'pattern' as const, pattern: '[A-Z]{3}' };
     const field = createMockDMMFField({ type: 'String' });
 
@@ -207,7 +207,7 @@ describe('generateMockExpression', () => {
     expect(result).toBe("faker.helpers.fromRegExp('[A-Z]{3}')");
   });
 
-  it('should generate enum expression', () => {
+  it('列挙式を生成する', () => {
     const annotation = { type: 'enum' as const, options: ['red', 'blue', 'green'] };
     const field = createMockDMMFField({ type: 'String' });
 
