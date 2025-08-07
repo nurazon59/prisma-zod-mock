@@ -94,13 +94,13 @@ model OrderItem {
 ### 複雑なテストシナリオ
 
 ```typescript
-import { 
+import {
   createCustomerMock,
   createProductMock,
   createOrderMock,
   createOrderItemMock,
   createAddressMock,
-  createCategoryMock
+  createCategoryMock,
 } from '../generated/mock';
 
 // テストシナリオ：プレミアム顧客の大量注文
@@ -109,7 +109,7 @@ export function createPremiumCustomerScenario() {
   const customer = createCustomerMock({
     customerType: 'premium',
     name: '山田花子',
-    email: 'yamada@example.com'
+    email: 'yamada@example.com',
   });
 
   // 複数の配送先住所を作成
@@ -118,22 +118,22 @@ export function createPremiumCustomerScenario() {
       customerId: customer.id,
       isDefault: true,
       prefecture: '東京都',
-      city: '渋谷区'
+      city: '渋谷区',
     }),
     createAddressMock({
       customerId: customer.id,
       isDefault: false,
       prefecture: '大阪府',
-      city: '大阪市'
-    })
+      city: '大阪市',
+    }),
   ];
 
   // カテゴリと商品を作成
   const electronics = createCategoryMock({ name: '電化製品' });
-  const products = Array.from({ length: 10 }, () => 
+  const products = Array.from({ length: 10 }, () =>
     createProductMock({
       price: Math.floor(Math.random() * 50000) + 10000,
-      stock: Math.floor(Math.random() * 100) + 10
+      stock: Math.floor(Math.random() * 100) + 10,
     })
   );
 
@@ -141,25 +141,22 @@ export function createPremiumCustomerScenario() {
   const order = createOrderMock({
     customerId: customer.id,
     status: 'processing',
-    totalAmount: 0 // 後で計算
+    totalAmount: 0, // 後で計算
   });
 
   // 注文アイテムを作成
-  const orderItems = products.slice(0, 5).map(product => {
+  const orderItems = products.slice(0, 5).map((product) => {
     const quantity = Math.floor(Math.random() * 5) + 1;
     return createOrderItemMock({
       orderId: order.id,
       productId: product.id,
       quantity,
-      price: product.price
+      price: product.price,
     });
   });
 
   // 合計金額を計算
-  order.totalAmount = orderItems.reduce(
-    (sum, item) => sum + item.price * item.quantity, 
-    0
-  );
+  order.totalAmount = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return {
     customer,
@@ -167,7 +164,7 @@ export function createPremiumCustomerScenario() {
     products,
     order,
     orderItems,
-    categories: [electronics]
+    categories: [electronics],
   };
 }
 ```
@@ -192,21 +189,21 @@ async function seed() {
   // シナリオを10個作成
   for (let i = 0; i < 10; i++) {
     const scenario = createPremiumCustomerScenario();
-    
+
     // 顧客を作成
     await prisma.customer.create({
       data: {
         ...scenario.customer,
         addresses: {
-          create: scenario.addresses.map(addr => ({
+          create: scenario.addresses.map((addr) => ({
             street: addr.street,
             city: addr.city,
             prefecture: addr.prefecture,
             postalCode: addr.postalCode,
-            isDefault: addr.isDefault
-          }))
-        }
-      }
+            isDefault: addr.isDefault,
+          })),
+        },
+      },
     });
 
     // カテゴリと商品を作成
@@ -215,16 +212,16 @@ async function seed() {
         data: {
           ...category,
           products: {
-            create: scenario.products.map(product => ({
+            create: scenario.products.map((product) => ({
               name: product.name,
               description: product.description,
               price: product.price,
               stock: product.stock,
               sku: product.sku,
-              imageUrl: product.imageUrl
-            }))
-          }
-        }
+              imageUrl: product.imageUrl,
+            })),
+          },
+        },
       });
     }
 
@@ -233,13 +230,13 @@ async function seed() {
       data: {
         ...scenario.order,
         orderItems: {
-          create: scenario.orderItems.map(item => ({
+          create: scenario.orderItems.map((item) => ({
             productId: item.productId,
             quantity: item.quantity,
-            price: item.price
-          }))
-        }
-      }
+            price: item.price,
+          })),
+        },
+      },
     });
   }
 

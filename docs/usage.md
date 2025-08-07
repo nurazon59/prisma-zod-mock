@@ -13,7 +13,7 @@ const user = createUserMock();
 // カスタム値でモックを作成
 const customUser = createUserMock({
   name: '田中太郎',
-  email: 'tanaka@example.com'
+  email: 'tanaka@example.com',
 });
 ```
 
@@ -24,9 +24,7 @@ import { createUserMock, createPostMock } from './generated/mock';
 
 // ユーザーと投稿を作成
 const user = createUserMock();
-const posts = Array.from({ length: 3 }, () => 
-  createPostMock({ authorId: user.id })
-);
+const posts = Array.from({ length: 3 }, () => createPostMock({ authorId: user.id }));
 ```
 
 ## Zodスキーマの使用
@@ -39,7 +37,7 @@ import { UserSchema } from './generated/zod';
 const userData = {
   id: '123',
   name: '田中太郎',
-  email: 'tanaka@example.com'
+  email: 'tanaka@example.com',
 };
 
 // バリデーション
@@ -57,10 +55,10 @@ describe('User Service', () => {
   it('should create a user', async () => {
     const mockUser = createUserMock();
     const result = await userService.create(mockUser);
-    
+
     expect(result).toMatchObject({
       name: mockUser.name,
-      email: mockUser.email
+      email: mockUser.email,
     });
   });
 });

@@ -58,30 +58,24 @@ model Tag {
 ### 生成されたモックの使用
 
 ```typescript
-import { 
-  createUserMock, 
-  createPostMock, 
-  createTagMock 
-} from '../generated/mock';
+import { createUserMock, createPostMock, createTagMock } from '../generated/mock';
 
 // ユーザーを作成
 const user = createUserMock({
   name: '田中太郎',
-  email: 'tanaka@example.com'
+  email: 'tanaka@example.com',
 });
 
 // ユーザーの投稿を作成
-const posts = Array.from({ length: 5 }, () => 
+const posts = Array.from({ length: 5 }, () =>
   createPostMock({
     authorId: user.id,
-    published: Math.random() > 0.5
+    published: Math.random() > 0.5,
   })
 );
 
 // タグを作成
-const tags = ['TypeScript', 'React', 'Prisma'].map(name =>
-  createTagMock({ name })
-);
+const tags = ['TypeScript', 'React', 'Prisma'].map((name) => createTagMock({ name }));
 ```
 
 ### テストでの使用
@@ -102,20 +96,18 @@ describe('Blog Service', () => {
   it('should create a user with posts', async () => {
     const mockUser = createUserMock();
     const user = await prisma.user.create({
-      data: mockUser
+      data: mockUser,
     });
 
-    const mockPosts = Array.from({ length: 3 }, () => 
-      createPostMock({ authorId: user.id })
-    );
+    const mockPosts = Array.from({ length: 3 }, () => createPostMock({ authorId: user.id }));
 
     const posts = await prisma.post.createMany({
-      data: mockPosts
+      data: mockPosts,
     });
 
     const userWithPosts = await prisma.user.findUnique({
       where: { id: user.id },
-      include: { posts: true }
+      include: { posts: true },
     });
 
     expect(userWithPosts?.posts).toHaveLength(3);

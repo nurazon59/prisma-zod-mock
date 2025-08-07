@@ -15,6 +15,7 @@ A: Prisma 5.0以上に対応しています。最新バージョンの使用を�
 ### Q: エラー「Cannot find generator」が表示されます
 
 A: 以下を確認してください：
+
 1. `prisma-zod-mock`が正しくインストールされているか
 2. `schema.prisma`でジェネレーターのproviderが正しく設定されているか
 3. `node_modules/.bin/`にprisma-zod-mockが存在するか
@@ -59,6 +60,7 @@ PRISMA_ZOD_MOCK_LOCALE=en npx prisma generate
 ### Q: TypeScriptのコンパイルエラーが発生します
 
 A: 以下を確認してください：
+
 1. `tsconfig.json`で生成されたファイルのパスが含まれているか
 2. Zodがプロジェクトにインストールされているか
 3. `@faker-js/faker`がインストールされているか
@@ -71,7 +73,7 @@ A: セマンティック推論を活用するか、`@mock`アノテーション�
 model User {
   /// @mock faker.person.fullName()
   name String
-  
+
   /// @mock faker.internet.email()
   email String
 }
@@ -94,6 +96,7 @@ import { createUserMock } from './generated/mock/User';
 ### Q: 生成が遅い
 
 A: 大規模なスキーマの場合、以下を試してください：
+
 1. 不要なモデルを一時的にコメントアウト
 2. `multipleFiles = true`で並列処理を活用
 3. リレーションの深度を制限
@@ -127,6 +130,7 @@ A: MITライセンスです。商用利用も可能です。
 ### Q: サポートが必要です
 
 A: 以下の方法でサポートを受けられます：
+
 1. GitHub Issuesで質問
 2. ドキュメントを確認
 3. サンプルコードを参照

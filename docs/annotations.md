@@ -20,6 +20,7 @@ model User {
 ## アノテーションの種類
 
 ### `@mock faker.*`
+
 Faker.jsのメソッドを直接指定します。
 
 ```prisma
@@ -34,6 +35,7 @@ bio String
 ```
 
 ### `@mock "固定値"`
+
 固定値を設定します。
 
 ```prisma
@@ -45,6 +47,7 @@ country String
 ```
 
 ### `@mock.range(min, max)`
+
 数値の範囲を指定します。
 
 ```prisma
@@ -56,6 +59,7 @@ price Float
 ```
 
 ### `@mock.pattern("正規表現")`
+
 正規表現パターンに従った値を生成します。
 
 ```prisma
@@ -67,6 +71,7 @@ phone String // 例: 080-1234-5678
 ```
 
 ### `@mock.enum("値1", "値2", ...)`
+
 指定した値からランダムに選択します。
 
 ```prisma
@@ -78,6 +83,7 @@ size String
 ```
 
 ### `@mock.length(min, max)`
+
 文字列の長さを指定します。
 
 ```prisma
@@ -95,20 +101,20 @@ password String
 ```prisma
 model Product {
   id          String   @id @default(uuid())
-  
+
   /// @mock faker.commerce.productName()
   name        String
-  
+
   /// @mock faker.commerce.productDescription()
   /// @mock.length(50, 200)
   description String
-  
+
   /// @mock.range(100, 10000)
   price       Float
-  
+
   /// @mock.enum("available", "out_of_stock", "discontinued")
   status      String
-  
+
   /// @mock.pattern("SKU-[A-Z]{3}-[0-9]{4}")
   sku         String   @unique
 }
@@ -119,16 +125,16 @@ model Product {
 ```prisma
 model JapaneseUser {
   id            String   @id @default(uuid())
-  
+
   /// @mock faker.person.lastName() + " " + faker.person.firstName()
   fullName      String
-  
+
   /// @mock faker.location.city() + "市"
   city          String
-  
+
   /// @mock.pattern("〒[0-9]{3}-[0-9]{4}")
   postalCode    String
-  
+
   /// @mock.enum("東京都", "大阪府", "愛知県", "福岡県")
   prefecture    String
 }
