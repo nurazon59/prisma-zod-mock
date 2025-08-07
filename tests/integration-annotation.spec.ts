@@ -3,8 +3,8 @@ import { generateMockFactory } from '../src/templates/mock-factory';
 import { createMockDMMFModel, createMockDMMFField, createMockDMMF } from './test-helpers';
 import { defaultConfig } from '../src/generator/config/types';
 
-describe('mockFactory with annotations', () => {
-  it('should use @zod-mock annotation when present', () => {
+describe('アノテーション付きmockFactory', () => {
+  it('@zod-mockアノテーションが存在する場合は使用する', () => {
     const model = createMockDMMFModel({
       name: 'User',
       fields: [
@@ -33,7 +33,7 @@ describe('mockFactory with annotations', () => {
     );
   });
 
-  it('should handle string literal annotations', () => {
+  it('文字列リテラルアノテーションを処理する', () => {
     const model = createMockDMMFModel({
       name: 'User',
       fields: [
@@ -53,7 +53,7 @@ describe('mockFactory with annotations', () => {
     expect(result).toContain("role: 'ADMIN'");
   });
 
-  it('should fall back to semantic analysis when no annotation', () => {
+  it('アノテーションがない場合はセマンティック分析にフォールバックする', () => {
     const model = createMockDMMFModel({
       name: 'User',
       fields: [
@@ -72,7 +72,7 @@ describe('mockFactory with annotations', () => {
     expect(result).toContain('email: faker.internet.email()');
   });
 
-  it('should handle multiline documentation with annotation', () => {
+  it('アノテーション付きの複数行ドキュメントを処理する', () => {
     const model = createMockDMMFModel({
       name: 'User',
       fields: [

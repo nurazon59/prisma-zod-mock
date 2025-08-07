@@ -13,7 +13,15 @@ export default defineConfig({
         branches: 60,
         statements: 80,
       },
-      exclude: ['dist/**', 'tests/**', '**/*.spec.ts', '**/*.test.ts', 'vitest.config.ts'],
+      exclude: [
+        'dist/**',
+        'tests/**',
+        '**/*.spec.ts',
+        '**/*.test.ts',
+        'vitest.config.ts',
+        'example/**',
+        '**/bin.ts', // CLIエントリーポイントは除外
+      ],
     },
   },
 });

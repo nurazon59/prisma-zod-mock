@@ -4,8 +4,8 @@ import { GeneratorOptions } from '@prisma/generator-helper';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
-describe('Integration Tests', () => {
-  it('should generate complete output for a complex schema', async () => {
+describe('統合テスト', () => {
+  it('複雑なスキーマに対して完全な出力を生成する', async () => {
     const outputDir = path.join(__dirname, 'temp-output');
 
     const options: GeneratorOptions = {
@@ -200,7 +200,7 @@ describe('Integration Tests', () => {
     await fs.rm(outputDir, { recursive: true, force: true });
   });
 
-  it('should generate multiple files when useMultipleFiles is true', async () => {
+  it('useMultipleFilesがtrueの場合は複数ファイルを生成する', async () => {
     const outputDir = path.join(__dirname, 'temp-output-multiple');
 
     const options: GeneratorOptions = {

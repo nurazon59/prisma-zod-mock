@@ -4,8 +4,8 @@ import { GeneratorOptions } from '@prisma/generator-helper';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
-describe('Relation Depth Tests', () => {
-  it('should generate mock factories with default depth of 4', async () => {
+describe('リレーション深度テスト', () => {
+  it('デフォルト深度4でモックファクトリを生成する', async () => {
     const outputDir = path.join(__dirname, 'temp-output-depth');
 
     const options: GeneratorOptions = {
@@ -236,7 +236,7 @@ describe('Relation Depth Tests', () => {
     await fs.rm(outputDir, { recursive: true, force: true });
   });
 
-  it('should use custom relationMaxDepth when configured', async () => {
+  it('設定されたカスタムrelationMaxDepthを使用する', async () => {
     const outputDir = path.join(__dirname, 'temp-output-custom-depth');
 
     const options: GeneratorOptions = {
@@ -375,7 +375,7 @@ describe('Relation Depth Tests', () => {
     await fs.rm(outputDir, { recursive: true, force: true });
   });
 
-  it('should support @mock.relationDepth annotation', async () => {
+  it('@mock.relationDepthアノテーションをサポートする', async () => {
     const outputDir = path.join(__dirname, 'temp-output-annotation-depth');
 
     const options: GeneratorOptions = {

@@ -7,7 +7,7 @@ import * as path from 'path';
 vi.mock('fs/promises');
 vi.mock('path');
 
-describe('generatorHandler', () => {
+describe('ジェネレーターハンドラー', () => {
   let mockOptions: GeneratorOptions;
 
   beforeEach(() => {
@@ -120,14 +120,14 @@ describe('generatorHandler', () => {
     vi.mocked(path.join).mockImplementation((...args) => args.join('/'));
   });
 
-  describe('generate', () => {
-    it('should create output directory when it does not exist', async () => {
+  describe('生成処理', () => {
+    it('出力ディレクトリが存在しない場合は作成する', async () => {
       await generate(mockOptions);
 
       expect(fs.mkdir).toHaveBeenCalledWith('/test/output', { recursive: true });
     });
 
-    it('should generate single file output by default', async () => {
+    it('デフォルトでは単一ファイル出力を生成する', async () => {
       await generate(mockOptions);
 
       expect(fs.writeFile).toHaveBeenCalledWith(
@@ -137,7 +137,7 @@ describe('generatorHandler', () => {
       );
     });
 
-    it('should generate Zod schemas when createZodSchemas is true', async () => {
+    it('createZodSchemasがtrueの場合はZodスキーマを生成する', async () => {
       mockOptions.generator.config.createZodSchemas = 'true';
 
       await generate(mockOptions);
@@ -151,7 +151,7 @@ describe('generatorHandler', () => {
       expect(generatedContent).toContain('name: z.string().nullable()');
     });
 
-    it('should generate mock factories when createMockFactories is true', async () => {
+    it('createMockFactoriesがtrueの場合はモックファクトリを生成する', async () => {
       mockOptions.generator.config.createMockFactories = 'true';
 
       await generate(mockOptions);
@@ -165,7 +165,7 @@ describe('generatorHandler', () => {
       expect(generatedContent).toContain('faker');
     });
 
-    it('should respect useMultipleFiles option', async () => {
+    it('useMultipleFilesオプションを尊重する', async () => {
       mockOptions.generator.config.useMultipleFiles = 'true';
 
       await generate(mockOptions);
@@ -185,7 +185,7 @@ describe('generatorHandler', () => {
       );
     });
 
-    it('should generate barrel file when writeBarrelFiles is true', async () => {
+    it('writeBarrelFilesがtrueの場合はバレルファイルを生成する', async () => {
       mockOptions.generator.config.useMultipleFiles = 'true';
       mockOptions.generator.config.writeBarrelFiles = 'true';
 
@@ -198,7 +198,7 @@ describe('generatorHandler', () => {
       );
     });
 
-    it('should handle empty models gracefully', async () => {
+    it('空のモデルを適切に処理する', async () => {
       mockOptions = {
         ...mockOptions,
         dmmf: {
@@ -219,7 +219,7 @@ describe('generatorHandler', () => {
       );
     });
 
-    it('should log success message when generation completes', async () => {
+    it('生成完了時に成功メッセージをログ出力する', async () => {
       const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
       await generate(mockOptions);
@@ -231,7 +231,7 @@ describe('generatorHandler', () => {
       consoleLogSpy.mockRestore();
     });
 
-    it('should throw error when output directory is not specified', async () => {
+    it('出力ディレクトリが指定されていない場合はエラーをスローする', async () => {
       mockOptions.generator.output = null;
 
       await expect(generate(mockOptions)).rejects.toThrow(
