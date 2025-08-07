@@ -30,7 +30,8 @@ describe('generateMockFactory', () => {
             isReadOnly: false,
             type: 'DateTime',
             hasDefaultValue: false,
-            documentation: '/// @mock faker.helpers.maybe(() => faker.date.between({ from: this.startTime, to: new Date() }), { probability: 0.8 })',
+            documentation:
+              '/// @mock faker.helpers.maybe(() => faker.date.between({ from: this.startTime, to: new Date() }), { probability: 0.8 })',
           },
         ],
         primaryKey: null,

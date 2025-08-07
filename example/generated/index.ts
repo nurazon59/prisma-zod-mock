@@ -79,7 +79,12 @@ export const createUserMock = (
   maxDepth: number = 4
 ): User => {
   return {
-    id: (() => { const t = Date.now().toString(36); const r = Math.random().toString(36).substring(2, 10); const c = Math.floor(Math.random() * 1000).toString(36); return `c${t}${r}${c}`.padEnd(25, '0').substring(0, 25); })(),
+    id: (() => {
+      const t = Date.now().toString(36);
+      const r = Math.random().toString(36).substring(2, 10);
+      const c = Math.floor(Math.random() * 1000).toString(36);
+      return `c${t}${r}${c}`.padEnd(25, '0').substring(0, 25);
+    })(),
     email: faker.internet.email(),
     name: Math.random() > 0.5 ? faker.person.fullName() : null,
     age: Math.random() > 0.5 ? faker.number.int({ min: 18, max: 100 }) : null,
@@ -87,10 +92,23 @@ export const createUserMock = (
     avatar: Math.random() > 0.5 ? faker.image.avatarGitHub() : null,
     createdAt: new Date(),
     updatedAt: faker.date.recent({ days: 30 }),
-    posts: depth < maxDepth ? createPostMockBatch(faker.number.int({ min: 1, max: 3 }), {}, depth + 1, maxDepth) : [],
-    profile: depth < maxDepth ? (Math.random() > 0.5 ? createProfileMock({}, depth + 1, maxDepth) : null) : null,
-    settings: depth < maxDepth ? (Math.random() > 0.5 ? createUserSettingsMock({}, depth + 1, maxDepth) : null) : null,
-    ...overrides
+    posts:
+      depth < maxDepth
+        ? createPostMockBatch(faker.number.int({ min: 1, max: 3 }), {}, depth + 1, maxDepth)
+        : [],
+    profile:
+      depth < maxDepth
+        ? Math.random() > 0.5
+          ? createProfileMock({}, depth + 1, maxDepth)
+          : null
+        : null,
+    settings:
+      depth < maxDepth
+        ? Math.random() > 0.5
+          ? createUserSettingsMock({}, depth + 1, maxDepth)
+          : null
+        : null,
+    ...overrides,
   };
 };
 
@@ -114,17 +132,26 @@ export const createProfileMock = (
   maxDepth: number = 4
 ): Profile => {
   return {
-    id: (() => { const t = Date.now().toString(36); const r = Math.random().toString(36).substring(2, 10); const c = Math.floor(Math.random() * 1000).toString(36); return `c${t}${r}${c}`.padEnd(25, '0').substring(0, 25); })(),
+    id: (() => {
+      const t = Date.now().toString(36);
+      const r = Math.random().toString(36).substring(2, 10);
+      const c = Math.floor(Math.random() * 1000).toString(36);
+      return `c${t}${r}${c}`.padEnd(25, '0').substring(0, 25);
+    })(),
     userId: faker.string.alpha(10),
-    phoneNumber: Math.random() > 0.5 ? faker.helpers.fromRegExp('[0-9]{3}-[0-9]{4}-[0-9]{4}') : null,
+    phoneNumber:
+      Math.random() > 0.5 ? faker.helpers.fromRegExp('[0-9]{3}-[0-9]{4}-[0-9]{4}') : null,
     address: Math.random() > 0.5 ? faker.location.streetAddress({ useFullAddress: true }) : null,
     city: Math.random() > 0.5 ? faker.location.city() : null,
-    country: Math.random() > 0.5 ? faker.helpers.arrayElement(['Japan', 'USA', 'UK', 'France', 'Germany']) : null,
+    country:
+      Math.random() > 0.5
+        ? faker.helpers.arrayElement(['Japan', 'USA', 'UK', 'France', 'Germany'])
+        : null,
     zipCode: Math.random() > 0.5 ? faker.helpers.fromRegExp('[0-9]{3}-[0-9]{4}') : null,
     birthDate: Math.random() > 0.5 ? faker.date.birthdate({ min: 18, max: 80, mode: 'age' }) : null,
     website: Math.random() > 0.5 ? faker.internet.url() : null,
     user: depth < maxDepth ? createUserMock({}, depth + 1, maxDepth) : ({} as User),
-    ...overrides
+    ...overrides,
   };
 };
 
@@ -148,7 +175,12 @@ export const createPostMock = (
   maxDepth: number = 4
 ): Post => {
   return {
-    id: (() => { const t = Date.now().toString(36); const r = Math.random().toString(36).substring(2, 10); const c = Math.floor(Math.random() * 1000).toString(36); return `c${t}${r}${c}`.padEnd(25, '0').substring(0, 25); })(),
+    id: (() => {
+      const t = Date.now().toString(36);
+      const r = Math.random().toString(36).substring(2, 10);
+      const c = Math.floor(Math.random() * 1000).toString(36);
+      return `c${t}${r}${c}`.padEnd(25, '0').substring(0, 25);
+    })(),
     title: faker.lorem.sentence({ min: 5, max: 10 }),
     slug: faker.lorem.slug(),
     content: Math.random() > 0.5 ? faker.lorem.paragraphs({ min: 3, max: 5 }) : null,
@@ -159,9 +191,15 @@ export const createPostMock = (
     updatedAt: faker.date.recent({ days: 30 }),
     publishedAt: Math.random() > 0.5 ? faker.date.recent({ days: 30 }) : null,
     author: depth < maxDepth ? createUserMock({}, depth + 1, maxDepth) : ({} as User),
-    categories: depth < maxDepth ? createCategoryMockBatch(faker.number.int({ min: 1, max: 3 }), {}, depth + 1, maxDepth) : [],
-    tags: depth < maxDepth ? createTagMockBatch(faker.number.int({ min: 1, max: 3 }), {}, depth + 1, maxDepth) : [],
-    ...overrides
+    categories:
+      depth < maxDepth
+        ? createCategoryMockBatch(faker.number.int({ min: 1, max: 3 }), {}, depth + 1, maxDepth)
+        : [],
+    tags:
+      depth < maxDepth
+        ? createTagMockBatch(faker.number.int({ min: 1, max: 3 }), {}, depth + 1, maxDepth)
+        : [],
+    ...overrides,
   };
 };
 
@@ -185,15 +223,31 @@ export const createCategoryMock = (
   maxDepth: number = 4
 ): Category => {
   return {
-    id: (() => { const t = Date.now().toString(36); const r = Math.random().toString(36).substring(2, 10); const c = Math.floor(Math.random() * 1000).toString(36); return `c${t}${r}${c}`.padEnd(25, '0').substring(0, 25); })(),
+    id: (() => {
+      const t = Date.now().toString(36);
+      const r = Math.random().toString(36).substring(2, 10);
+      const c = Math.floor(Math.random() * 1000).toString(36);
+      return `c${t}${r}${c}`.padEnd(25, '0').substring(0, 25);
+    })(),
     name: faker.lorem.word(),
     slug: faker.lorem.slug(),
     description: Math.random() > 0.5 ? faker.lorem.sentence() : null,
     parentId: Math.random() > 0.5 ? faker.string.alpha(10) : null,
-    posts: depth < maxDepth ? createPostMockBatch(faker.number.int({ min: 1, max: 3 }), {}, depth + 1, maxDepth) : [],
-    parent: depth < maxDepth ? (Math.random() > 0.5 ? createCategoryMock({}, depth + 1, maxDepth) : null) : null,
-    children: depth < maxDepth ? createCategoryMockBatch(faker.number.int({ min: 1, max: 3 }), {}, depth + 1, maxDepth) : [],
-    ...overrides
+    posts:
+      depth < maxDepth
+        ? createPostMockBatch(faker.number.int({ min: 1, max: 3 }), {}, depth + 1, maxDepth)
+        : [],
+    parent:
+      depth < maxDepth
+        ? Math.random() > 0.5
+          ? createCategoryMock({}, depth + 1, maxDepth)
+          : null
+        : null,
+    children:
+      depth < maxDepth
+        ? createCategoryMockBatch(faker.number.int({ min: 1, max: 3 }), {}, depth + 1, maxDepth)
+        : [],
+    ...overrides,
   };
 };
 
@@ -217,10 +271,18 @@ export const createTagMock = (
   maxDepth: number = 4
 ): Tag => {
   return {
-    id: (() => { const t = Date.now().toString(36); const r = Math.random().toString(36).substring(2, 10); const c = Math.floor(Math.random() * 1000).toString(36); return `c${t}${r}${c}`.padEnd(25, '0').substring(0, 25); })(),
+    id: (() => {
+      const t = Date.now().toString(36);
+      const r = Math.random().toString(36).substring(2, 10);
+      const c = Math.floor(Math.random() * 1000).toString(36);
+      return `c${t}${r}${c}`.padEnd(25, '0').substring(0, 25);
+    })(),
     name: faker.word.adjective(),
-    posts: depth < maxDepth ? createPostMockBatch(faker.number.int({ min: 1, max: 3 }), {}, depth + 1, maxDepth) : [],
-    ...overrides
+    posts:
+      depth < maxDepth
+        ? createPostMockBatch(faker.number.int({ min: 1, max: 3 }), {}, depth + 1, maxDepth)
+        : [],
+    ...overrides,
   };
 };
 
@@ -244,16 +306,21 @@ export const createUserSettingsMock = (
   maxDepth: number = 4
 ): UserSettings => {
   return {
-    id: (() => { const t = Date.now().toString(36); const r = Math.random().toString(36).substring(2, 10); const c = Math.floor(Math.random() * 1000).toString(36); return `c${t}${r}${c}`.padEnd(25, '0').substring(0, 25); })(),
+    id: (() => {
+      const t = Date.now().toString(36);
+      const r = Math.random().toString(36).substring(2, 10);
+      const c = Math.floor(Math.random() * 1000).toString(36);
+      return `c${t}${r}${c}`.padEnd(25, '0').substring(0, 25);
+    })(),
     userId: faker.string.alpha(10),
     emailNotifications: true,
     pushNotifications: false,
     language: faker.helpers.arrayElement(['ja', 'en', 'zh', 'ko']),
-    timezone: "Asia/Tokyo",
+    timezone: 'Asia/Tokyo',
     weeklyReportEnabled: faker.datatype.boolean(),
     marketingEmails: false,
     user: depth < maxDepth ? createUserMock({}, depth + 1, maxDepth) : ({} as User),
-    ...overrides
+    ...overrides,
   };
 };
 
@@ -266,8 +333,9 @@ export const createUserSettingsMockBatch = (
   return Array.from({ length: count }, () => createUserSettingsMock(overrides, depth, maxDepth));
 };
 
-export const createValidatedUserSettingsMock = (overrides?: Partial<UserSettings>): UserSettings => {
+export const createValidatedUserSettingsMock = (
+  overrides?: Partial<UserSettings>
+): UserSettings => {
   const mockData = createUserSettingsMock(overrides);
   return UserSettingsSchema.parse(mockData);
 };
-
