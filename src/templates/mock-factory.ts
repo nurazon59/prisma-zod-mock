@@ -136,7 +136,8 @@ function generateFieldMockValue(field: DMMF.Field, config: GeneratorConfig): str
         case 'now':
           return 'new Date()';
         case 'cuid':
-          return 'faker.string.nanoid()';
+          // 簡易的なCUID生成（c + timestamp + random）
+          return "(() => { const t = Date.now().toString(36); const r = Math.random().toString(36).substring(2, 10); const c = Math.floor(Math.random() * 1000).toString(36); return `c${t}${r}${c}`.padEnd(25, '0').substring(0, 25); })()";
         case 'uuid':
           return 'faker.string.uuid()';
         case 'autoincrement':

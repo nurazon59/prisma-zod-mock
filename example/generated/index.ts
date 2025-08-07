@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { faker } from '@faker-js/faker';
 
-// ===== Zod Schemas =====
 export const UserSchema = z.object({
   id: z.string().cuid().optional(),
   email: z.string().email(),
@@ -74,23 +73,34 @@ export const UserSettingsSchema = z.object({
 
 export type UserSettings = z.infer<typeof UserSettingsSchema>;
 
-// ===== Mock Factories =====
-export const createUserMock = (overrides?: Partial<User>): User => {
+export const createUserMock = (
+  overrides?: Partial<User>,
+  depth: number = 0,
+  maxDepth: number = 4
+): User => {
   return {
-    id: faker.string.nanoid(),
+    id: (() => { const t = Date.now().toString(36); const r = Math.random().toString(36).substring(2, 10); const c = Math.floor(Math.random() * 1000).toString(36); return `c${t}${r}${c}`.padEnd(25, '0').substring(0, 25); })(),
     email: faker.internet.email(),
     name: Math.random() > 0.5 ? faker.person.fullName() : null,
-    age: Math.random() > 0.5 ? faker.number.int({ min: 1, max: 1000 }) : null,
+    age: Math.random() > 0.5 ? faker.number.int({ min: 18, max: 100 }) : null,
     bio: Math.random() > 0.5 ? faker.lorem.paragraph() : null,
-    avatar: Math.random() > 0.5 ? faker.image.url() : null,
+    avatar: Math.random() > 0.5 ? faker.image.avatarGitHub() : null,
     createdAt: new Date(),
     updatedAt: faker.date.recent({ days: 30 }),
-    ...overrides,
+    posts: depth < maxDepth ? createPostMockBatch(faker.number.int({ min: 1, max: 3 }), {}, depth + 1, maxDepth) : [],
+    profile: depth < maxDepth ? (Math.random() > 0.5 ? createProfileMock({}, depth + 1, maxDepth) : null) : null,
+    settings: depth < maxDepth ? (Math.random() > 0.5 ? createUserSettingsMock({}, depth + 1, maxDepth) : null) : null,
+    ...overrides
   };
 };
 
-export const createUserMockBatch = (count: number = 10, overrides?: Partial<User>): User[] => {
-  return Array.from({ length: count }, () => createUserMock(overrides));
+export const createUserMockBatch = (
+  count: number = 10,
+  overrides?: Partial<User>,
+  depth: number = 0,
+  maxDepth: number = 4
+): User[] => {
+  return Array.from({ length: count }, () => createUserMock(overrides, depth, maxDepth));
 };
 
 export const createValidatedUserMock = (overrides?: Partial<User>): User => {
@@ -98,26 +108,33 @@ export const createValidatedUserMock = (overrides?: Partial<User>): User => {
   return UserSchema.parse(mockData);
 };
 
-export const createProfileMock = (overrides?: Partial<Profile>): Profile => {
+export const createProfileMock = (
+  overrides?: Partial<Profile>,
+  depth: number = 0,
+  maxDepth: number = 4
+): Profile => {
   return {
-    id: faker.string.nanoid(),
+    id: (() => { const t = Date.now().toString(36); const r = Math.random().toString(36).substring(2, 10); const c = Math.floor(Math.random() * 1000).toString(36); return `c${t}${r}${c}`.padEnd(25, '0').substring(0, 25); })(),
     userId: faker.string.alpha(10),
-    phoneNumber: Math.random() > 0.5 ? faker.phone.number() : null,
-    address: Math.random() > 0.5 ? faker.location.streetAddress() : null,
+    phoneNumber: Math.random() > 0.5 ? faker.helpers.fromRegExp('[0-9]{3}-[0-9]{4}-[0-9]{4}') : null,
+    address: Math.random() > 0.5 ? faker.location.streetAddress({ useFullAddress: true }) : null,
     city: Math.random() > 0.5 ? faker.location.city() : null,
-    country: Math.random() > 0.5 ? faker.location.country() : null,
-    zipCode: Math.random() > 0.5 ? faker.location.zipCode() : null,
-    birthDate: Math.random() > 0.5 ? faker.date.recent({ days: 30 }) : null,
+    country: Math.random() > 0.5 ? faker.helpers.arrayElement(['Japan', 'USA', 'UK', 'France', 'Germany']) : null,
+    zipCode: Math.random() > 0.5 ? faker.helpers.fromRegExp('[0-9]{3}-[0-9]{4}') : null,
+    birthDate: Math.random() > 0.5 ? faker.date.birthdate({ min: 18, max: 80, mode: 'age' }) : null,
     website: Math.random() > 0.5 ? faker.internet.url() : null,
-    ...overrides,
+    user: depth < maxDepth ? createUserMock({}, depth + 1, maxDepth) : ({} as User),
+    ...overrides
   };
 };
 
 export const createProfileMockBatch = (
   count: number = 10,
-  overrides?: Partial<Profile>
+  overrides?: Partial<Profile>,
+  depth: number = 0,
+  maxDepth: number = 4
 ): Profile[] => {
-  return Array.from({ length: count }, () => createProfileMock(overrides));
+  return Array.from({ length: count }, () => createProfileMock(overrides, depth, maxDepth));
 };
 
 export const createValidatedProfileMock = (overrides?: Partial<Profile>): Profile => {
@@ -125,24 +142,36 @@ export const createValidatedProfileMock = (overrides?: Partial<Profile>): Profil
   return ProfileSchema.parse(mockData);
 };
 
-export const createPostMock = (overrides?: Partial<Post>): Post => {
+export const createPostMock = (
+  overrides?: Partial<Post>,
+  depth: number = 0,
+  maxDepth: number = 4
+): Post => {
   return {
-    id: faker.string.nanoid(),
-    title: faker.lorem.sentence(),
-    slug: faker.string.alpha(10),
-    content: Math.random() > 0.5 ? faker.string.alpha(10) : null,
-    published: faker.datatype.boolean(),
-    views: faker.number.int({ min: 1, max: 1000 }),
+    id: (() => { const t = Date.now().toString(36); const r = Math.random().toString(36).substring(2, 10); const c = Math.floor(Math.random() * 1000).toString(36); return `c${t}${r}${c}`.padEnd(25, '0').substring(0, 25); })(),
+    title: faker.lorem.sentence({ min: 5, max: 10 }),
+    slug: faker.lorem.slug(),
+    content: Math.random() > 0.5 ? faker.lorem.paragraphs({ min: 3, max: 5 }) : null,
+    published: faker.datatype.boolean({ probability: 0.7 }),
+    views: faker.number.int({ min: 0, max: 10000 }),
     authorId: faker.string.alpha(10),
     createdAt: new Date(),
     updatedAt: faker.date.recent({ days: 30 }),
     publishedAt: Math.random() > 0.5 ? faker.date.recent({ days: 30 }) : null,
-    ...overrides,
+    author: depth < maxDepth ? createUserMock({}, depth + 1, maxDepth) : ({} as User),
+    categories: depth < maxDepth ? createCategoryMockBatch(faker.number.int({ min: 1, max: 3 }), {}, depth + 1, maxDepth) : [],
+    tags: depth < maxDepth ? createTagMockBatch(faker.number.int({ min: 1, max: 3 }), {}, depth + 1, maxDepth) : [],
+    ...overrides
   };
 };
 
-export const createPostMockBatch = (count: number = 10, overrides?: Partial<Post>): Post[] => {
-  return Array.from({ length: count }, () => createPostMock(overrides));
+export const createPostMockBatch = (
+  count: number = 10,
+  overrides?: Partial<Post>,
+  depth: number = 0,
+  maxDepth: number = 4
+): Post[] => {
+  return Array.from({ length: count }, () => createPostMock(overrides, depth, maxDepth));
 };
 
 export const createValidatedPostMock = (overrides?: Partial<Post>): Post => {
@@ -150,22 +179,31 @@ export const createValidatedPostMock = (overrides?: Partial<Post>): Post => {
   return PostSchema.parse(mockData);
 };
 
-export const createCategoryMock = (overrides?: Partial<Category>): Category => {
+export const createCategoryMock = (
+  overrides?: Partial<Category>,
+  depth: number = 0,
+  maxDepth: number = 4
+): Category => {
   return {
-    id: faker.string.nanoid(),
-    name: faker.person.fullName(),
-    slug: faker.string.alpha(10),
-    description: Math.random() > 0.5 ? faker.lorem.paragraph() : null,
+    id: (() => { const t = Date.now().toString(36); const r = Math.random().toString(36).substring(2, 10); const c = Math.floor(Math.random() * 1000).toString(36); return `c${t}${r}${c}`.padEnd(25, '0').substring(0, 25); })(),
+    name: faker.lorem.word(),
+    slug: faker.lorem.slug(),
+    description: Math.random() > 0.5 ? faker.lorem.sentence() : null,
     parentId: Math.random() > 0.5 ? faker.string.alpha(10) : null,
-    ...overrides,
+    posts: depth < maxDepth ? createPostMockBatch(faker.number.int({ min: 1, max: 3 }), {}, depth + 1, maxDepth) : [],
+    parent: depth < maxDepth ? (Math.random() > 0.5 ? createCategoryMock({}, depth + 1, maxDepth) : null) : null,
+    children: depth < maxDepth ? createCategoryMockBatch(faker.number.int({ min: 1, max: 3 }), {}, depth + 1, maxDepth) : [],
+    ...overrides
   };
 };
 
 export const createCategoryMockBatch = (
   count: number = 10,
-  overrides?: Partial<Category>
+  overrides?: Partial<Category>,
+  depth: number = 0,
+  maxDepth: number = 4
 ): Category[] => {
-  return Array.from({ length: count }, () => createCategoryMock(overrides));
+  return Array.from({ length: count }, () => createCategoryMock(overrides, depth, maxDepth));
 };
 
 export const createValidatedCategoryMock = (overrides?: Partial<Category>): Category => {
@@ -173,16 +211,26 @@ export const createValidatedCategoryMock = (overrides?: Partial<Category>): Cate
   return CategorySchema.parse(mockData);
 };
 
-export const createTagMock = (overrides?: Partial<Tag>): Tag => {
+export const createTagMock = (
+  overrides?: Partial<Tag>,
+  depth: number = 0,
+  maxDepth: number = 4
+): Tag => {
   return {
-    id: faker.string.nanoid(),
-    name: faker.person.fullName(),
-    ...overrides,
+    id: (() => { const t = Date.now().toString(36); const r = Math.random().toString(36).substring(2, 10); const c = Math.floor(Math.random() * 1000).toString(36); return `c${t}${r}${c}`.padEnd(25, '0').substring(0, 25); })(),
+    name: faker.word.adjective(),
+    posts: depth < maxDepth ? createPostMockBatch(faker.number.int({ min: 1, max: 3 }), {}, depth + 1, maxDepth) : [],
+    ...overrides
   };
 };
 
-export const createTagMockBatch = (count: number = 10, overrides?: Partial<Tag>): Tag[] => {
-  return Array.from({ length: count }, () => createTagMock(overrides));
+export const createTagMockBatch = (
+  count: number = 10,
+  overrides?: Partial<Tag>,
+  depth: number = 0,
+  maxDepth: number = 4
+): Tag[] => {
+  return Array.from({ length: count }, () => createTagMock(overrides, depth, maxDepth));
 };
 
 export const createValidatedTagMock = (overrides?: Partial<Tag>): Tag => {
@@ -190,30 +238,36 @@ export const createValidatedTagMock = (overrides?: Partial<Tag>): Tag => {
   return TagSchema.parse(mockData);
 };
 
-export const createUserSettingsMock = (overrides?: Partial<UserSettings>): UserSettings => {
+export const createUserSettingsMock = (
+  overrides?: Partial<UserSettings>,
+  depth: number = 0,
+  maxDepth: number = 4
+): UserSettings => {
   return {
-    id: faker.string.nanoid(),
+    id: (() => { const t = Date.now().toString(36); const r = Math.random().toString(36).substring(2, 10); const c = Math.floor(Math.random() * 1000).toString(36); return `c${t}${r}${c}`.padEnd(25, '0').substring(0, 25); })(),
     userId: faker.string.alpha(10),
-    emailNotifications: faker.internet.email(),
-    pushNotifications: faker.datatype.boolean(),
-    language: faker.string.alpha(10),
-    timezone: faker.string.alpha(10),
+    emailNotifications: true,
+    pushNotifications: false,
+    language: faker.helpers.arrayElement(['ja', 'en', 'zh', 'ko']),
+    timezone: "Asia/Tokyo",
     weeklyReportEnabled: faker.datatype.boolean(),
-    marketingEmails: faker.internet.email(),
-    ...overrides,
+    marketingEmails: false,
+    user: depth < maxDepth ? createUserMock({}, depth + 1, maxDepth) : ({} as User),
+    ...overrides
   };
 };
 
 export const createUserSettingsMockBatch = (
   count: number = 10,
-  overrides?: Partial<UserSettings>
+  overrides?: Partial<UserSettings>,
+  depth: number = 0,
+  maxDepth: number = 4
 ): UserSettings[] => {
-  return Array.from({ length: count }, () => createUserSettingsMock(overrides));
+  return Array.from({ length: count }, () => createUserSettingsMock(overrides, depth, maxDepth));
 };
 
-export const createValidatedUserSettingsMock = (
-  overrides?: Partial<UserSettings>
-): UserSettings => {
+export const createValidatedUserSettingsMock = (overrides?: Partial<UserSettings>): UserSettings => {
   const mockData = createUserSettingsMock(overrides);
   return UserSettingsSchema.parse(mockData);
 };
+
