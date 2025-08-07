@@ -1,5 +1,10 @@
 # Prisma Zod Mock
 
+[![CI](https://github.com/itsuki54/prisma-zod-mock/actions/workflows/ci.yml/badge.svg)](https://github.com/itsuki54/prisma-zod-mock/actions/workflows/ci.yml)
+[![Documentation](https://github.com/itsuki54/prisma-zod-mock/actions/workflows/docs.yml/badge.svg)](https://github.com/itsuki54/prisma-zod-mock/actions/workflows/docs.yml)
+[![npm version](https://badge.fury.io/js/prisma-zod-mock.svg)](https://badge.fury.io/js/prisma-zod-mock)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 An integrated library that automatically generates Zod validation schemas and mock data factories from Prisma schemas.
 
 ## Features
