@@ -112,7 +112,8 @@ describe('mockFactory with default values', () => {
 
     const result = generateMockFactory(model, config, dmmf);
 
-    expect(result).toContain('id: faker.string.nanoid()');
+    // CUIDはインライン関数として生成される
+    expect(result).toContain('(() => { const t = Date.now().toString(36)');
     expect(result).toContain('createdAt: new Date()');
   });
 
@@ -167,7 +168,11 @@ describe('mockFactory with default values', () => {
           name: 'sequenceId',
           type: 'Int',
           hasDefaultValue: true,
-          default: { name: 'dbgenerated', args: ['nextval("user_sequence")'] as any },
+          default: {
+            name: 'dbgenerated',
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            args: ['nextval("user_sequence")'] as readonly any[],
+          },
         }),
       ],
     });

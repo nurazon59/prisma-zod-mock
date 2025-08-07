@@ -29,12 +29,42 @@ export function generateMockFactory(
     factory += `export const create${model.name}Mock = (overrides?: Partial<${modelType}>): ${modelType} => {\n`;
   }
 
-  factory += '  return {\n';
+  // this参照があるフィールドをチェック
+  const hasThisReference = model.fields.some((f) => f.documentation?.includes('this.') ?? false);
 
-  // スカラーフィールドの処理
-  for (const field of model.fields) {
-    if (field.kind === 'scalar') {
-      factory += `    ${field.name}: ${generateFieldMockValue(field, config)},\n`;
+  if (hasThisReference) {
+    // this参照がある場合は、まず基本データを作成
+    factory += '  const baseData = {\n';
+
+    // this参照を持たないフィールドを先に処理
+    for (const field of model.fields) {
+      if (field.kind === 'scalar' && !field.documentation?.includes('this.')) {
+        factory += `    ${field.name}: ${generateFieldMockValue(field, config)},\n`;
+      }
+    }
+
+    factory += '  };\n\n';
+    factory += '  const mockData = {\n';
+    factory += '    ...baseData,\n';
+
+    // this参照を持つフィールドを後で処理
+    for (const field of model.fields) {
+      if (field.kind === 'scalar' && field.documentation?.includes('this.')) {
+        const mockValue = generateFieldMockValue(field, config);
+        // thisをbaseDataに置き換え
+        const replacedValue = mockValue.replace(/\bthis\./g, 'baseData.');
+        factory += `    ${field.name}: ${replacedValue},\n`;
+      }
+    }
+  } else {
+    // this参照がない場合は通常の処理
+    factory += '  const mockData = {\n';
+
+    // スカラーフィールドの処理
+    for (const field of model.fields) {
+      if (field.kind === 'scalar') {
+        factory += `    ${field.name}: ${generateFieldMockValue(field, config)},\n`;
+      }
     }
   }
 
@@ -49,6 +79,7 @@ export function generateMockFactory(
 
   factory += '    ...overrides\n';
   factory += '  };\n';
+  factory += '  return mockData;\n';
   factory += '};\n\n';
 
   // バッチ生成関数
@@ -72,8 +103,17 @@ export function generateMockFactory(
 
   if (config.createZodSchemas) {
     factory += '\n\n';
-    factory += `export const createValidated${model.name}Mock = (overrides?: Partial<${modelType}>): ${modelType} => {\n`;
-    factory += `  const mockData = create${model.name}Mock(overrides);\n`;
+    if (config.createRelationMocks && hasRelations) {
+      factory += `export const createValidated${model.name}Mock = (\n`;
+      factory += `  overrides?: Partial<${modelType}>,\n`;
+      factory += `  depth: number = 0,\n`;
+      factory += `  maxDepth: number = ${modelMaxDepth}\n`;
+      factory += `): ${modelType} => {\n`;
+      factory += `  const mockData = create${model.name}Mock(overrides, depth, maxDepth);\n`;
+    } else {
+      factory += `export const createValidated${model.name}Mock = (overrides?: Partial<${modelType}>): ${modelType} => {\n`;
+      factory += `  const mockData = create${model.name}Mock(overrides);\n`;
+    }
     factory += `  return ${model.name}Schema.parse(mockData);\n`;
     factory += '};';
   }
@@ -124,7 +164,8 @@ function generateFieldMockValue(field: DMMF.Field, config: GeneratorConfig): str
   const annotation = parseZodMockAnnotation(field);
   if (annotation && annotation.type !== 'relationDepth') {
     const mockValue = generateMockExpression(annotation, field);
-    if (!field.isRequired) {
+    // faker.helpers.maybeが既に含まれている場合は、追加のランダム処理を加えない
+    if (!field.isRequired && !mockValue.includes('faker.helpers.maybe')) {
       return `Math.random() > 0.5 ? ${mockValue} : null`;
     }
     return mockValue;

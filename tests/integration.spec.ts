@@ -180,7 +180,8 @@ describe('Integration Tests', () => {
     expect(content).toContain(
       'export const createUserMock = (overrides?: Partial<User>): User => {'
     );
-    expect(content).toContain('faker.string.nanoid()');
+    // CUIDはインライン関数として生成される
+    expect(content).toContain('(() => { const t = Date.now().toString(36)');
     expect(content).toContain('faker.internet.email()');
     expect(content).toContain('faker.person.fullName()');
     expect(content).toContain('faker.lorem.paragraph()');

@@ -17,7 +17,8 @@ export function parseZodMockAnnotation(field: DMMF.Field): ZodMockAnnotation | n
 
   const lines = field.documentation.split('\n');
   for (const line of lines) {
-    const trimmed = line.trim();
+    // ///から始まる場合は削除
+    const trimmed = line.trim().replace(/^\/\/\/\s*/, '');
 
     if (trimmed.startsWith('@mock faker.')) {
       const expression = trimmed.substring('@mock '.length).trim();
